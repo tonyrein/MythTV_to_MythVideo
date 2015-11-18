@@ -15,8 +15,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-import nonpublic
-
 from nonpublic.settings import DEV_DB, DEV_DB_HOST, DEV_DB_PASSWORD, DEV_DB_USER, DEV_KEY
 
 # Quick-start development settings - unsuitable for production
