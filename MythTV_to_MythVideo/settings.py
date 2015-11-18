@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'nonpublic',
+    'mythcontent',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -94,6 +95,7 @@ DATABASES = {
 
 
 
+DATABASE_ROUTERS = ['mythcontent.dbrouters.MythContentRouter']
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
