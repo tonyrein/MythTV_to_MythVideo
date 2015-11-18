@@ -17,12 +17,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 import nonpublic
 
+from nonpublic.settings import DEV_DB, DEV_DB_HOST, DEV_DB_PASSWORD, DEV_DB_USER, DEV_KEY
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = nonpublic.settings.DEV_KEY
+SECRET_KEY = DEV_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'nonpublic',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -82,11 +84,11 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
     'mythcopy': {
-        'NAME': nonpublic.settings.DEV_DB,
+        'NAME': DEV_DB,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': nonpublic.settings.DEV_DB_HOST,
-        'USER': nonpublic.settings.DEV_DB_USER,
-        'PASSWORD': nonpublic.settings.DEV_DB_PASSWORD,
+        'HOST': DEV_DB_HOST,
+        'USER': DEV_DB_USER,
+        'PASSWORD': DEV_DB_PASSWORD,
     }
 }
 
