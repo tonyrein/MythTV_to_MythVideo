@@ -23,6 +23,27 @@ class MythApi(object):
 		self.tv_programs = None # Don't set this until it's needed.
 
 	"""
+	Make a call to the MythTV API and return the result as JSON
+	"""
+	def _call_myth_api(self,service_name, call_name, data=None, headers=None):
+		# Ensure result is in form of JSON:
+		if headers is None:
+			headers =  { 'Accept':'application/json' }
+		else:
+			headers['Accept'] = 'application/json'
+		# Assemble url:
+		url = (
+			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
+			)
+		# Make a Request object and pass it to the server.
+		# Use the returned result to make some JSON to return
+		req = urllib.request.Request(url, data, headers)
+		with urllib.request.urlopen(req) as response:
+			the_answer = response.read()
+			return json.loads(the_answer.decode('utf-8'))
+		
+
+	"""
 	Gets list of storage groups available to
 	MythTV server self.server_name.
 	 Pass: self
@@ -31,19 +52,21 @@ class MythApi(object):
 	 On failure, or if there are no storage groups, returns empty list.
 	"""
 	def _discover_storage_groups(self):
-		retlist = []
-		service_name='Myth'
-		api_call='GetStorageGroupDirs'
-		url = (
-			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, api_call)
-			)
-		data = None
-		headers = { 'Accept':'application/json' }
-		req = urllib.request.Request(url, data, headers)
-		with urllib.request.urlopen(req) as response:
-			the_answer = response.read()
-			sgjson = json.loads(the_answer.decode('utf-8'))
+# 		service_name='Myth'
+# 		api_call='GetStorageGroupDirs'
+# 		url = (
+# 			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, api_call)
+# 			)
+# 		data = None
+# 		headers = { 'Accept':'application/json' }
+# 		req = urllib.request.Request(url, data, headers)
+# 		with urllib.request.urlopen(req) as response:
+# 			the_answer = response.read()
+# 			sgjson = json.loads(the_answer.decode('utf-8'))
+# 		sgdirs = sgjson['StorageGroupDirList']['StorageGroupDirs']
+		sgjson = self._call_myth_api('Myth', 'GetStorageGroupDirs')
 		sgdirs = sgjson['StorageGroupDirList']['StorageGroupDirs']
+		retlist = []
 		for sg in sgdirs:
 			retlist.append(storage_group(sg['HostName'],sg['GroupName'],sg['DirName']))
 		return retlist
