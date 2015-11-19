@@ -7,7 +7,7 @@ storage_group = namedtuple('StorageDir', ['host','name','directory'])
 
 
 
-tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'length', 'channel_number', 'host',
+tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'duration', 'channel_number', 'host',
 	'storage_group', 'file_name', 'file_size' ])
 
 
