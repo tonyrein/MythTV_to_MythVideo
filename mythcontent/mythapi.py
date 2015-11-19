@@ -110,8 +110,8 @@ class MythApi(object):
 # 	'storage_group', 'file_name', 'file_size' ])
 		for p in proglist:
 			# Get duration:
-			start_dt = iso8601.parse_date(p['StartTime'])
-			end_dt = iso8601.parse_date(p['EndTime'])
+			start_dt = iso8601.parse_date(p['Recording']['StartTs'])
+			end_dt = iso8601.parse_date(p['Recording']['EndTs'])
 			prog_dur = end_dt - start_dt
 			seconds = prog_dur.seconds
 			days, seconds = divmod(seconds, 86400)
@@ -127,7 +127,7 @@ class MythApi(object):
 			else:
 				dstr = ''
 			dstr = dstr + '%dh %02dm' % (hours, minutes)
-			retlist.append( tv_recording(p['Title'], p['SubTitle'], p['Description'], p['StartTime'], dstr, p['Channel']['ChanNum'], p['HostName'],
+			retlist.append( tv_recording(p['Title'], p['SubTitle'], p['Description'], p['Recording']['StartTs'], dstr, p['Channel']['ChanNum'], p['HostName'],
 							p['Recording']['StorageGroup'], p['FileName'], p['FileSize'] ) )
 # 			retlist.append(t)
 		return retlist
