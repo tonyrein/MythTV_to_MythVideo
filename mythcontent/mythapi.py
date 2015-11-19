@@ -1,12 +1,13 @@
 import urllib.request
 import json
+import xmltodict
 import iso8601
 from collections import namedtuple
 storage_group = namedtuple('StorageDir', ['host','name','directory'])
 
 
 
-tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'start_at', 'length', 'channel_number', 'host',
+tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'length', 'channel_number', 'host',
 	'storage_group', 'file_name', 'file_size' ])
 
 
@@ -44,6 +45,24 @@ class MythApi(object):
 			the_answer = response.read()
 			return json.loads(the_answer.decode('utf-8'))
 		
+	"""
+	Make a call to the MythTV API and return the result as an ordereddict:
+	"""
+	def _call_myth_api_for_xml(self,service_name, call_name, data=None, headers=None):
+		# urlopen doesn't always work if headers is None:
+		if headers is None:
+			headers = {}
+		# Assemble url:
+		url = (
+			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
+			)
+		# Make a Request object and pass it to the server.
+		# Use the returned result to make some JSON to return
+		req = urllib.request.Request(url, data, headers)
+		with urllib.request.urlopen(req) as response:
+			the_answer = response.read()
+			return xmltodict.parse(the_answer)
+		
 
 	"""
 	Gets list of storage groups available to
@@ -71,8 +90,9 @@ class MythApi(object):
 		if host is None:
 			host = self.server_name
 		for sg in self.storage_groups:
-			if sg[0] == host and sg[1] == name:
-				return sg[2]
+			if sg.host == host and sg.name == name:
+# 			if sg[0] == host and sg[1] == name:
+				return sg.directory
 		return None
 
 	"""
@@ -89,8 +109,8 @@ class MythApi(object):
 	If program list is empty, return []
 	"""
 	def discover_tv_programs(self):
-		sgjson = self._call_myth_api('Dvr', 'GetRecordedList')
-		proglist = sgjson['Programs']['ProgramList']
+		progdict = self._call_myth_api_for_xml('Dvr', 'GetRecordedList')
+		proglist = progdict['ProgramList']['Programs']['Program']
 		retlist = []
 # 		tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'start_at', 'length', 'channel_number', 'host',
 # 	'storage_group', 'file_name', 'file_size' ])
@@ -103,19 +123,20 @@ class MythApi(object):
 			days, seconds = divmod(seconds, 86400)
 			hours, seconds = divmod(seconds, 3600)
 			minutes, seconds = divmod(seconds, 60)
-			dstr = "{} days, {} hours, {} minutes".format(days, hours, minutes)
+# 			dstr = "{} days, {} hours, {} minutes".format(days, hours, minutes)
 # 			
-# 			if days > 0:
-# 				dstr = '%d day' % (days)
-# 				if days > 1:
-# 					dstr = dstr + 's'
-# 				dstr = dstr + ' '
-# 			else:
-# 				dstr = ''
-# 			dstr = dstr + '%dh %dm' % (hours, minutes)
-			t = tv_recording(p['Title'], p['SubTitle'], p['StartTime'], dstr, p['Channel']['ChanNum'], p['HostName'],
-							p['StorageGroup'], p['FileName'], p['FileSize'] )
-			retlist.append(t)
+			if days > 0:
+				dstr = '%d day' % (days)
+				if days > 1:
+					dstr = dstr + 's'
+				dstr = dstr + ' '
+			else:
+				dstr = ''
+			dstr = dstr + '%dh %02dm' % (hours, minutes)
+			retlist.append( tv_recording(p['Title'], p['SubTitle'], p['Description'], p['StartTime'], dstr, p['Channel']['ChanNum'], p['HostName'],
+							p['Recording']['StorageGroup'], p['FileName'], p['FileSize'] ) )
+# 			retlist.append(t)
+		return retlist
 		
 		
 		
