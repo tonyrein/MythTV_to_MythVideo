@@ -22,42 +22,54 @@ class MythApi(object):
 		self.storage_groups = self._discover_storage_groups()
 		self.video_storage_group = self.get_storage_dir(name='Videos')
 		self.default_storage_group = self.get_storage_dir(name='Default')
-		self.tv_programs = None # Don't set this until it's needed.
+		self.tv_programs = None # This is more expensive, so don't set this until and unless it's needed.
 
 	"""
 	Make a call to the MythTV API and return the result as JSON
 	"""
-	def _call_myth_api(self,service_name, call_name, data=None, headers=None):
-		# Ensure result is in form of JSON:
-		encstr = 'text/javascript'
-		if headers is None:
-			headers =  { 'Accept':encstr }
-		else:
-			headers['Accept'] = encstr
-		# Assemble url:
-		url = (
-			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
-			)
-		# Make a Request object and pass it to the server.
-		# Use the returned result to make some JSON to return
-		req = urllib.request.Request(url, data, headers)
-		with urllib.request.urlopen(req) as response:
-			the_answer = response.read()
-			return json.loads(the_answer.decode('utf-8'))
+# 	def _call_myth_api(self,service_name, call_name, data=None, headers=None):
+# 		# Ensure result is in form of JSON:
+# 		encstr = 'text/javascript'
+# 		if headers is None:
+# 			headers =  { 'Accept':encstr }
+# 		else:
+# 			headers['Accept'] = encstr
+# 		# Assemble url:
+# 		url = (
+# 			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
+# 			)
+# 		# Make a Request object and pass it to the server.
+# 		# Use the returned result to make some JSON to return
+# 		req = urllib.request.Request(url, data, headers)
+# 		with urllib.request.urlopen(req) as response:
+# 			the_answer = response.read()
+# 			return json.loads(the_answer.decode('utf-8'))
 		
 	"""
-	Make a call to the MythTV API and return the result as an ordereddict:
+	Make a call to the MythTV API and request XML back from MythTV server.
+	Pass:
+	  * name of API service
+	  * name of API call within service
+	  * data (optional)
+	  * headers (optional)
+	Returns:
+	  * An ordereddict created by parsing the XML returned from the MythTV server
 	"""
 	def _call_myth_api_for_xml(self,service_name, call_name, data=None, headers=None):
 		# urlopen doesn't always work if headers is None:
 		if headers is None:
 			headers = {}
+		# Does headers contain 'Accept'?
+		if 'Accept' in headers:
+			# If headers['Accept'] is requesting JSON, delete that key.
+			if headers['Accept'] == 'text/javascript' or headers['Accept'] == 'application/json':
+				del headers['Accept']
 		# Assemble url:
 		url = (
 			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
 			)
 		# Make a Request object and pass it to the server.
-		# Use the returned result to make some JSON to return
+		# Use the returned result to make some XML to return to our caller
 		req = urllib.request.Request(url, data, headers)
 		with urllib.request.urlopen(req) as response:
 			the_answer = response.read()
@@ -73,18 +85,21 @@ class MythApi(object):
 	 On failure, or if there are no storage groups, returns empty list.
 	"""
 	def _discover_storage_groups(self):
-		sgjson = self._call_myth_api('Myth', 'GetStorageGroupDirs')
-		sgdirs = sgjson['StorageGroupDirList']['StorageGroupDirs']
+		sgxml = self._call_myth_api_for_xml('Myth', 'GetStorageGroupDirs')
+		sgdirs = sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
 		retlist = []
 		for sg in sgdirs:
 			retlist.append(storage_group(sg['HostName'],sg['GroupName'],sg['DirName']))
 		return retlist
 
+
 	"""
-	Pass: storage group name and host.
-	Return: the corresponding directory.
-	If no host is given, assume self.server_name.
-	If no match, return None
+	Pass:
+	 * storage group name
+	 * host (optional)
+	 (If no host is given, assume self.server_name.)
+	Return:
+	 * the corresponding directory, or None if no match
 	"""
 	def get_storage_dir(self, name='', host=None):
 		if host is None:
