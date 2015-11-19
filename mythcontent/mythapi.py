@@ -25,27 +25,6 @@ class MythApi(object):
 		self.tv_programs = None # This is more expensive, so don't set this until and unless it's needed.
 
 	"""
-	Make a call to the MythTV API and return the result as JSON
-	"""
-# 	def _call_myth_api(self,service_name, call_name, data=None, headers=None):
-# 		# Ensure result is in form of JSON:
-# 		encstr = 'text/javascript'
-# 		if headers is None:
-# 			headers =  { 'Accept':encstr }
-# 		else:
-# 			headers['Accept'] = encstr
-# 		# Assemble url:
-# 		url = (
-# 			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
-# 			)
-# 		# Make a Request object and pass it to the server.
-# 		# Use the returned result to make some JSON to return
-# 		req = urllib.request.Request(url, data, headers)
-# 		with urllib.request.urlopen(req) as response:
-# 			the_answer = response.read()
-# 			return json.loads(the_answer.decode('utf-8'))
-		
-	"""
 	Make a call to the MythTV API and request XML back from MythTV server.
 	Pass:
 	  * name of API service
