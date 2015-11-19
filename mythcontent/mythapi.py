@@ -1,11 +1,12 @@
 import urllib.request
 import json
+import iso8601
 from collections import namedtuple
 storage_group = namedtuple('StorageDir', ['host','name','directory'])
 
 
 
-tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'start_at', 'length', 'channel_id', 'host',
+tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'start_at', 'length', 'channel_number', 'host',
 	'storage_group', 'file_name', 'file_size' ])
 
 
@@ -27,10 +28,11 @@ class MythApi(object):
 	"""
 	def _call_myth_api(self,service_name, call_name, data=None, headers=None):
 		# Ensure result is in form of JSON:
+		encstr = 'text/javascript'
 		if headers is None:
-			headers =  { 'Accept':'application/json' }
+			headers =  { 'Accept':encstr }
 		else:
-			headers['Accept'] = 'application/json'
+			headers['Accept'] = encstr
 		# Assemble url:
 		url = (
 			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
@@ -52,18 +54,6 @@ class MythApi(object):
 	 On failure, or if there are no storage groups, returns empty list.
 	"""
 	def _discover_storage_groups(self):
-# 		service_name='Myth'
-# 		api_call='GetStorageGroupDirs'
-# 		url = (
-# 			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, api_call)
-# 			)
-# 		data = None
-# 		headers = { 'Accept':'application/json' }
-# 		req = urllib.request.Request(url, data, headers)
-# 		with urllib.request.urlopen(req) as response:
-# 			the_answer = response.read()
-# 			sgjson = json.loads(the_answer.decode('utf-8'))
-# 		sgdirs = sgjson['StorageGroupDirList']['StorageGroupDirs']
 		sgjson = self._call_myth_api('Myth', 'GetStorageGroupDirs')
 		sgdirs = sgjson['StorageGroupDirList']['StorageGroupDirs']
 		retlist = []
@@ -99,18 +89,34 @@ class MythApi(object):
 	If program list is empty, return []
 	"""
 	def discover_tv_programs(self):
-		service_name='Dvr'
-		api_call='GetRecordedList'
-		url = (
-			"http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, api_call)
-			)
-		data = None
-		headers = { 'Accept':'application/json' }
-		req = urllib.request.Request(url, data, headers)
-		with urllib.request.urlopen(req) as response:
-			the_answer = response.read()
-			sgjson = json.loads(the_answer.decode('utf-8'))
+		sgjson = self._call_myth_api('Dvr', 'GetRecordedList')
 		proglist = sgjson['Programs']['ProgramList']
+		retlist = []
+# 		tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'start_at', 'length', 'channel_number', 'host',
+# 	'storage_group', 'file_name', 'file_size' ])
+		for p in proglist:
+			# Get duration:
+			start_dt = iso8601.parse_date(p['StartTime'])
+			end_dt = iso8601.parse_date(p['EndTime'])
+			prog_dur = end_dt - start_dt
+			seconds = prog_dur.seconds
+			days, seconds = divmod(seconds, 86400)
+			hours, seconds = divmod(seconds, 3600)
+			minutes, seconds = divmod(seconds, 60)
+			dstr = "{} days, {} hours, {} minutes".format(days, hours, minutes)
+# 			
+# 			if days > 0:
+# 				dstr = '%d day' % (days)
+# 				if days > 1:
+# 					dstr = dstr + 's'
+# 				dstr = dstr + ' '
+# 			else:
+# 				dstr = ''
+# 			dstr = dstr + '%dh %dm' % (hours, minutes)
+			t = tv_recording(p['Title'], p['SubTitle'], p['StartTime'], dstr, p['Channel']['ChanNum'], p['HostName'],
+							p['StorageGroup'], p['FileName'], p['FileSize'] )
+			retlist.append(t)
+		
 		
 		
 			
