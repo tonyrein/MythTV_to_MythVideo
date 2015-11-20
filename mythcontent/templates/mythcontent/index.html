@@ -1,0 +1,11 @@
+{% if tv_program_list %}
+	<ul>
+	{% for prog in tv_program_list %}
+		<li>
+		{{prog.title}}: {{prog.subtitle}}<br>
+		{{prog.start_at}}&nbsp;{{prog.duration}}<br>
+		{{prog.description}}<br>
+		</li>
+	{% endfor %}
+	</ul>
+{% endif %}

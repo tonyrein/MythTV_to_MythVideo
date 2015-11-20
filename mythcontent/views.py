@@ -8,7 +8,10 @@ from .mythapi import MythApi
 Display a list of recorded TV programs
 """
 def index(request):
-    return HttpResponse("This page will display a list of TV programs.")
+    api = MythApi()
+    tv_program_list = api.get_myth_tv_program_list()
+    context = { 'tv_program_list': tv_program_list }
+    return render(request, 'mythcontent/index.html', context)
 
 def videos(request):
     api = MythApi()

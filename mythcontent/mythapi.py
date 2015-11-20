@@ -2,6 +2,10 @@ import urllib.request
 import xmltodict
 import iso8601
 from collections import namedtuple
+from django.utils import timezone
+import pytz
+import datetime
+
 storage_group = namedtuple('StorageDir', ['host','name','directory'])
 
 tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'duration', 'channel_number', 'host',
@@ -11,6 +15,29 @@ myth_video = namedtuple(
                     'MythVideo',
                      ['title','subtitle','description','length','play_count','season','episode','watched','content_type','file_name','host',]
                      )
+
+
+"""
+convenience method to convert a date/time
+string from UTC to local
+"""
+def utc_to_local(dtstr):
+    d = iso8601.parse_date(dtstr, 'Etc/UTC')
+    if not timezone.is_aware(d):
+        ad = timezone.make_aware(d, pytz.timezone('Etc/UTC'))
+    else:
+        ad = d
+    return timezone.localtime(ad)
+
+"""
+convenience method to convert a datetime from
+local to UTC
+For now, assume dt is timezone-aware -- otherwise
+we wouldn't know what timezone we're converting from.
+"""
+def local_to_utc(dt):
+    return timezone.localtime(dt, pytz.timezone('Etc/UTC'))
+    
 
 class MythApi(object):
     """
@@ -109,9 +136,15 @@ class MythApi(object):
         retlist = []
         for p in prog_list:
             # Get duration:
-            start_dt = iso8601.parse_date(p['Recording']['StartTs'])
-            end_dt = iso8601.parse_date(p['Recording']['EndTs'])
-            prog_dur = end_dt - start_dt
+            start_date_local = utc_to_local(p['Recording']['StartTs'])
+            end_date_local = utc_to_local(p['Recording']['EndTs'])
+            prog_dur = end_date_local - start_date_local
+#             start_dt_utc = iso8601.parse_date(p['Recording']['StartTs'])
+#             end_dt_utc = iso8601.parse_date(p['Recording']['EndTs'])
+#             if not timezone.is_aware(start_dt_utc):
+#                 start_dt_utc = timezone.make_aware(value, timezone)
+#             
+#             prog_dur = end_dt - start_dt
             # Break duration into components:
             seconds = prog_dur.seconds
             days, seconds = divmod(seconds, 86400)
@@ -119,15 +152,16 @@ class MythApi(object):
             minutes, seconds = divmod(seconds, 60)
             # Construct a string to represent the duration:
             if days > 0:
-                dstr = '%d day' % (days)
+                dur_str = '%d day' % (days)
                 if days > 1:
-                    dstr = dstr + 's'
-                dstr = dstr + ' '
+                    dur_str = dur_str + 's'
+                dur_str = dur_str + ' '
             else:
-                dstr = ''
-            dstr = dstr + '%dh %02dm' % (hours, minutes)
+                dur_str = ''
+            dur_str = dur_str + '%dh %02dm' % (hours, minutes)
+#             start_at_str = "{0:02d}/{1:02d}/{2:-4d}".format(start_date_local.month, start_date_local.day, start_date_local.year)
             # Make a tv_recording namedtuple and store it in the list to be returned:
-            retlist.append( tv_recording(p['Title'], p['SubTitle'], p['Description'], p['Recording']['StartTs'], dstr, p['Channel']['ChanNum'], p['HostName'],
+            retlist.append( tv_recording(p['Title'], p['SubTitle'], p['Description'], start_date_local, dur_str, p['Channel']['ChanNum'], p['HostName'],
                             p['Recording']['StorageGroup'], p['FileName'], p['FileSize'] ) )
         return retlist
         
