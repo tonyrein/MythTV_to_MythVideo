@@ -1,0 +1,7 @@
+{% if video_list %}
+	<ul>
+	{% for vid in video_list %}
+		<li>{{ vid.title }}: {{vid.subtitle}}</li>
+	{% endfor %}
+	</ul>
+{% endif %}
