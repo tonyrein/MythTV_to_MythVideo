@@ -4,7 +4,22 @@ import iso8601
 from django.utils import timezone
 import pytz
 
-from .dto import storage_group, tv_recording, myth_video
+# from .dto import storage_group, tv_recording, myth_video
+
+
+from collections import namedtuple
+
+# Streamable structures to hold info about items manipulated
+# via Myth API calls:
+storage_group = namedtuple('StorageDir', ['host','name','directory'])
+
+tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'duration', 'channel_number', 'host',
+    'storage_group', 'file_name', 'file_size', 'channel_id', 'start_ts' ])
+
+myth_video = namedtuple(
+                    'MythVideo',
+                     ['title','subtitle','description','length','play_count','season','episode','watched','content_type','file_name','host',]
+                     )
 
 
 """
@@ -26,6 +41,17 @@ we wouldn't know what timezone we're converting from.
 def local_to_utc(dt):
     return timezone.localtime(dt, pytz.timezone('Etc/UTC'))
     
+from collections import namedtuple
+
+storage_group = namedtuple('StorageDir', ['host','name','directory'])
+
+tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'duration', 'channel_number', 'host',
+    'storage_group', 'file_name', 'file_size', 'channel_id', 'start_ts' ])
+
+myth_video = namedtuple(
+                    'MythVideo',
+                     ['title','subtitle','description','length','play_count','season','episode','watched','content_type','file_name','host',]
+                     )
 
 class MythApi(object):
     """

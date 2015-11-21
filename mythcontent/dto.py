@@ -1,11 +1,17 @@
-from collections import namedtuple
+import os
 
-storage_group = namedtuple('StorageDir', ['host','name','directory'])
+from mythcontent.mythapi import MythApi, tv_recording, storage_group
 
-tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'duration', 'channel_number', 'host',
-    'storage_group', 'file_name', 'file_size', 'channel_id', 'start_ts' ])
 
-myth_video = namedtuple(
-                    'MythVideo',
-                     ['title','subtitle','description','length','play_count','season','episode','watched','content_type','file_name','host',]
-                     )
+class TvRecording(object):
+    def __init__(self, data):
+        self._data = data # data should be a tv_recording named_tuple
+        st_dir = MythApi().get_storage_dir(name=data.storage_group)
+        self.filespec = st_dir + data.file_name # st_dir already ends with os.sep.
+            
+             
+    
+        
+
+class Video(object):
+    pass
