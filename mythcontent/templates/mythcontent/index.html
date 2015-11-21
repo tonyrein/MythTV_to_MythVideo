@@ -1,11 +1,17 @@
 {% if request.session.tv_program_list %}
+	<form action="{% url 'mythcontent:process_moves' %}" method="post">
+	 {% csrf_token %}
 	<ul>
 	{% for prog in request.session.tv_program_list|dictsort:"title" %}
 		<li>
+		<input type="checkbox" name="selected_programs"
+		value={{prog.file_name}}....{{prog.start_ts}} />
 		{{prog.title}}<br> {{prog.subtitle}}<br>
 		Recording started at {{prog.start_at}} and lasted {{prog.duration}}<br>
 		{{prog.description}}
 		</li><br>
 	{% endfor %}
 	</ul>
+	<input type="submit" value="Submit"/>
+	</form>
 {% endif %}
