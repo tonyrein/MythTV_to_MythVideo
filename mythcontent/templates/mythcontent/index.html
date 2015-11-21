@@ -5,7 +5,7 @@
 	{% for prog in request.session.tv_program_list|dictsort:"title" %}
 		<li>
 		<input type="checkbox" name="selected_programs"
-		value={{prog.file_name}}....{{prog.start_ts}} />
+		value={{prog.channel_id}}....{{prog.start_ts}} />
 		{{prog.title}}<br> {{prog.subtitle}}<br>
 		Recording started at {{prog.start_at}} and lasted {{prog.duration}}<br>
 		{{prog.description}}

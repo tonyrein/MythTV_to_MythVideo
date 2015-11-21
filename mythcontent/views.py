@@ -25,6 +25,13 @@ def process_moves(request):
     if request.method != 'POST':
         raise Exception("Must use Post with this view")
     checkboxlist = request.POST.getlist('selected_programs')
+    # Each element in the list is channel_id....start_ts
+    selected_programs = []
+    for b in checkboxlist:
+        # retrieve tv program namedtuple with this channel id and start ts
+        channel_id, start_ts = b.split('....')
+        list_of_one = [ r for r in request.session['tv_program_list'] if r.channel_id == channel_id and r.start_ts == start_ts ]
+        selected_programs.append(list_of_one[0])
     template = loader.get_template('mythcontent/process_moves.html')
     context = RequestContext(request, {'selected_programs': checkboxlist, })
     return HttpResponse(template.render(context))
