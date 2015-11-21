@@ -1,11 +1,11 @@
-{% if tv_program_list %}
+{% if request.session.tv_program_list %}
 	<ul>
-	{% for prog in tv_program_list %}
+	{% for prog in request.session.tv_program_list|dictsort:"title" %}
 		<li>
-		{{prog.title}}: {{prog.subtitle}}<br>
-		{{prog.start_at}}&nbsp;{{prog.duration}}<br>
-		{{prog.description}}<br>
-		</li>
+		{{prog.title}}<br> {{prog.subtitle}}<br>
+		Recording started at {{prog.start_at}} and lasted {{prog.duration}}<br>
+		{{prog.description}}
+		</li><br>
 	{% endfor %}
 	</ul>
 {% endif %}

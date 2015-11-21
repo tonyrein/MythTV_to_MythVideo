@@ -9,7 +9,7 @@ import datetime
 storage_group = namedtuple('StorageDir', ['host','name','directory'])
 
 tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'duration', 'channel_number', 'host',
-    'storage_group', 'file_name', 'file_size' ])
+    'storage_group', 'file_name', 'file_size', 'channel_id', 'start_ts' ])
 
 myth_video = namedtuple(
                     'MythVideo',
@@ -139,12 +139,6 @@ class MythApi(object):
             start_date_local = utc_to_local(p['Recording']['StartTs'])
             end_date_local = utc_to_local(p['Recording']['EndTs'])
             prog_dur = end_date_local - start_date_local
-#             start_dt_utc = iso8601.parse_date(p['Recording']['StartTs'])
-#             end_dt_utc = iso8601.parse_date(p['Recording']['EndTs'])
-#             if not timezone.is_aware(start_dt_utc):
-#                 start_dt_utc = timezone.make_aware(value, timezone)
-#             
-#             prog_dur = end_dt - start_dt
             # Break duration into components:
             seconds = prog_dur.seconds
             days, seconds = divmod(seconds, 86400)
@@ -159,10 +153,12 @@ class MythApi(object):
             else:
                 dur_str = ''
             dur_str = dur_str + '%dh %02dm' % (hours, minutes)
-#             start_at_str = "{0:02d}/{1:02d}/{2:-4d}".format(start_date_local.month, start_date_local.day, start_date_local.year)
+            start_at_string = start_date_local.strftime("%m/%d/%Y, %I:%M %p")
             # Make a tv_recording namedtuple and store it in the list to be returned:
-            retlist.append( tv_recording(p['Title'], p['SubTitle'], p['Description'], start_date_local, dur_str, p['Channel']['ChanNum'], p['HostName'],
-                            p['Recording']['StorageGroup'], p['FileName'], p['FileSize'] ) )
+            retlist.append( tv_recording(p['Title'], p['SubTitle'], p['Description'],
+							 start_at_string, dur_str, p['Channel']['ChanNum'], p['HostName'],
+                            p['Recording']['StorageGroup'], p['FileName'], p['FileSize'],
+                            p['Channel']['ChanId'], p['Recording']['StartTs'] ) )
         return retlist
         
     def get_mythvideo_list(self):
@@ -176,8 +172,15 @@ class MythApi(object):
                                 v['Episode'], v['Watched'], v['ContentType'], v['FileName'], v['HostName'] )
                         )
         return retlist
-             
-        
+    """
+    Ask the Myth API for a single TV program, identified by channel and
+    start time. Note that this uses the channel id and not the channel
+    number, and the "StartTS" time (the time the recording actually started,
+    as opposed to the time the program was scheduled to begin).
+    """
+    def get_myth_tv_program(self, channel_id, start_ts):
+    	data = { 'ChanId': channel_id, 'StartTime': start_ts }
+    	prog_dict = self._call_myth_api_for_xml('Dvr', 'GetRecorded', data)
             
 
     
