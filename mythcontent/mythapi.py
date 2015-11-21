@@ -31,13 +31,27 @@ class MythApi(object):
     """
     This class encapsulates the code to interact with a
     MythTV server via its API.
+    It is a singleton.
     """
-    def __init__(self, server_name = 'mythbackend1', port=6544):
-        self.server_name = server_name
-        self.server_port = port
-        self.storage_groups = self._get_myth_storage_group_list()
-        self.video_storage_group = self.get_storage_dir(name='Videos')
-        self.default_storage_group = self.get_storage_dir(name='Default')
+    __instance = None
+    
+    def __new__(cls, server_name='mythbackend1', server_port=6544):
+        if MythApi.__instance is None:
+            MythApi.__instance = object.__new__(cls)
+            MythApi.__instance.server_name = server_name
+            MythApi.__instance.server_port = server_port
+            MythApi.__instance.storage_groups = MythApi.__instance._get_myth_storage_group_list()
+            MythApi.__instance.video_storage_group = MythApi.__instance.get_storage_dir(name='Videos')
+            MythApi.__instance.default_storage_group = MythApi.__instance.get_storage_dir(name='Default')
+        return MythApi.__instance
+            
+    
+#     def __init__(self, server_name = 'mythbackend1', port=6544):
+#         self.server_name = server_name
+#         self.server_port = port
+#         self.storage_groups = self._get_myth_storage_group_list()
+#         self.video_storage_group = self.get_storage_dir(name='Videos')
+#         self.default_storage_group = self.get_storage_dir(name='Default')
 
     """
     Make a call to the MythTV API and request XML back from MythTV server.
