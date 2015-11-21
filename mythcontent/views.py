@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.template import RequestContext, loader
 
 from .mythapi import MythApi
+from .dto import myth_video, storage_group, tv_recording
 # Create your views here.
 
 """
@@ -13,13 +14,18 @@ def index(request):
     tv_program_list = api.get_myth_tv_program_list()
     # save list in session:
     request.session['tv_program_list'] = tv_program_list
-    return render(request, 'mythcontent/index.html')
+    template = loader.get_template('mythcontent/index.html')
+    context = RequestContext(request,)
+    return HttpResponse(template.render(context))
+#     return render(request, 'mythcontent/index.html')
 
 def videos(request):
     api = MythApi()
     video_list = api.get_mythvideo_list()
-    context = {'video_list': video_list}
-    return render(request, 'mythcontent/videos.html', context)
+    template = loader.get_template('mythcontent/videos.html')
+    context = RequestContext(request, {'video_list': video_list, })
+    return HttpResponse(template.render(context))
+#     return render(request, 'mythcontent/videos.html', context)
 
 def process_moves(request):
     if request.method != 'POST':
@@ -27,12 +33,14 @@ def process_moves(request):
     checkboxlist = request.POST.getlist('selected_programs')
     # Each element in the list is channel_id....start_ts
     selected_programs = []
+    # Get list of programs as namedtuples:
+    sess_list = request.session['tv_program_list']
     for b in checkboxlist:
-        # retrieve tv program namedtuple with this channel id and start ts
         channel_id, start_ts = b.split('....')
-        list_of_one = [ r for r in request.session['tv_program_list'] if r.channel_id == channel_id and r.start_ts == start_ts ]
-        selected_programs.append(list_of_one[0])
+        for s in sess_list:
+            prog = tv_recording(*s)
+            if prog.channel_id == channel_id and prog.start_ts == start_ts:
+                selected_programs.append(prog)
     template = loader.get_template('mythcontent/process_moves.html')
-    context = RequestContext(request, {'selected_programs': checkboxlist, })
+    context = RequestContext(request, {'selected_programs': selected_programs, })
     return HttpResponse(template.render(context))
-#    return render(request, 'mythcontent/process_moves.html')

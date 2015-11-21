@@ -1,20 +1,10 @@
 import urllib.request
 import xmltodict
 import iso8601
-from collections import namedtuple
 from django.utils import timezone
 import pytz
-import datetime
 
-storage_group = namedtuple('StorageDir', ['host','name','directory'])
-
-tv_recording = namedtuple('TVRecording', ['title', 'subtitle', 'description', 'start_at', 'duration', 'channel_number', 'host',
-    'storage_group', 'file_name', 'file_size', 'channel_id', 'start_ts' ])
-
-myth_video = namedtuple(
-                    'MythVideo',
-                     ['title','subtitle','description','length','play_count','season','episode','watched','content_type','file_name','host',]
-                     )
+from .dto import storage_group, tv_recording, myth_video
 
 
 """
@@ -24,10 +14,8 @@ string from UTC to local
 def utc_to_local(dtstr):
     d = iso8601.parse_date(dtstr, 'Etc/UTC')
     if not timezone.is_aware(d):
-        ad = timezone.make_aware(d, pytz.timezone('Etc/UTC'))
-    else:
-        ad = d
-    return timezone.localtime(ad)
+        d = timezone.make_aware(d, pytz.timezone('Etc/UTC'))
+    return timezone.localtime(d)
 
 """
 convenience method to convert a datetime from
@@ -50,7 +38,6 @@ class MythApi(object):
         self.storage_groups = self._get_myth_storage_group_list()
         self.video_storage_group = self.get_storage_dir(name='Videos')
         self.default_storage_group = self.get_storage_dir(name='Default')
-        self.tv_programs = None # This is more expensive, so don't set this until and unless it's needed.
 
     """
     Make a call to the MythTV API and request XML back from MythTV server.
@@ -113,7 +100,6 @@ class MythApi(object):
             host = self.server_name
         for sg in self.storage_groups:
             if sg.host == host and sg.name == name:
-#             if sg[0] == host and sg[1] == name:
                 return sg.directory
         return None
 
@@ -165,22 +151,23 @@ class MythApi(object):
         video_dict = self._call_myth_api_for_xml('Video', 'GetVideoList')
         video_list = video_dict['VideoMetadataInfoList']['VideoMetadataInfos']['VideoMetadataInfo']
         retlist = []
-        #['title','subtitle','description','length','play_count','season','episode','watched','content_type','file_name','host',]
         for v in video_list:
             retlist.append(
                         myth_video(v['Title'], v['SubTitle'], v['Description'], v['Length'], v['PlayCount'], v['Season'],
                                 v['Episode'], v['Watched'], v['ContentType'], v['FileName'], v['HostName'] )
                         )
         return retlist
+    
     """
     Ask the Myth API for a single TV program, identified by channel and
     start time. Note that this uses the channel id and not the channel
     number, and the "StartTS" time (the time the recording actually started,
     as opposed to the time the program was scheduled to begin).
     """
-    def get_myth_tv_program(self, channel_id, start_ts):
-    	data = { 'ChanId': channel_id, 'StartTime': start_ts }
-    	prog_dict = self._call_myth_api_for_xml('Dvr', 'GetRecorded', data)
-            
+    # Might not be needed. Don't define it yet.
+#     def get_myth_tv_program(self, channel_id, start_ts):
+#     	data = { 'ChanId': channel_id, 'StartTime': start_ts }
+#     	prog_dict = self._call_myth_api_for_xml('Dvr', 'GetRecorded', data)
+#             
 
     
