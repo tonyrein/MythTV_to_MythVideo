@@ -1,0 +1,16 @@
+<h1>List of selected programs</h1>
+<hr/>
+This page will display a list of selected programs.
+
+{% if selected_programs %}
+	{% for p in selected_programs %}
+		<li>
+		{{p.title}}<br/>
+		{{p.subtitle}}<br/>
+		{{p.start_at}}<br/>
+		{{p.file_size|filesizeformat}}
+		</li>
+		<br/>
+	{% endfor %}
+
+{% endif %}
