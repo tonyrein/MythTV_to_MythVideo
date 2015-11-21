@@ -1,7 +1,6 @@
-import os
 
-from mythcontent.mythapi import MythApi, tv_recording, storage_group
 
+from mythcontent.mythapi import MythApi
 
 class TvRecording(object):
     def __init__(self, data):
