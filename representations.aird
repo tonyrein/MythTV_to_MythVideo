@@ -10,7 +10,7 @@
     <viewpoint xmi:type="description:Viewpoint" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Capture']"/>
   </ownedViews>
   <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_MG-FEJE0EeWsQNn59hdsiA" initialized="true">
-    <ownedRepresentations xmi:type="diagram:DSemanticDiagram" xmi:id="_7sQQAJE8EeWIpOPBohsQPw" name="Service Layer Class Diagram">
+    <ownedRepresentations xmi:type="diagram:DSemanticDiagram" xmi:id="_7sQQAJE8EeWIpOPBohsQPw" name="Main Packages and Classes">
       <ownedAnnotationEntries xmi:type="description:AnnotationEntry" xmi:id="_7sqfsJE8EeWIpOPBohsQPw" source="GMF_DIAGRAMS">
         <data xmi:type="notation:Diagram" xmi:id="_7sqfsZE8EeWIpOPBohsQPw" type="Sirius" element="_7sQQAJE8EeWIpOPBohsQPw" measurementUnit="Pixel">
           <children xmi:type="notation:Node" xmi:id="_OsV1wJE9EeWIpOPBohsQPw" type="2002" element="_OpAN4JE9EeWIpOPBohsQPw">
