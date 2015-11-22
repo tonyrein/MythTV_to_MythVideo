@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_LzmdIJE0EeWsQNn59hdsiA" name="Layers">
+  <packagedElement xmi:type="uml:Package" xmi:id="_Oo78cJE9EeWIpOPBohsQPw" name="Service">
+    <packagedElement xmi:type="uml:Class" xmi:id="_z980oJFJEeWIpOPBohsQPw" name="VidService">
+      <ownedAttribute xmi:id="_UtFAcJFOEeWIpOPBohsQPw" name="list_of_vids"/>
+      <ownedOperation xmi:id="_9IrCUJFKEeWIpOPBohsQPw" name="add_to_mythvideo">
+        <ownedParameter xmi:id="_N9ylUJFLEeWIpOPBohsQPw" name="vid_to_add" type="_ane0QJFMEeWIpOPBohsQPw"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_oqppgJFLEeWIpOPBohsQPw" name="list_vids"/>
+      <ownedOperation xmi:id="_qx7fEJFLEeWIpOPBohsQPw" name="update_vid">
+        <ownedParameter xmi:id="_sgbBMJFLEeWIpOPBohsQPw" name="vid_to_update" type="_ane0QJFMEeWIpOPBohsQPw"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_6gUDgJFLEeWIpOPBohsQPw" name="delete_vid">
+        <ownedParameter xmi:id="_7wBX4JFLEeWIpOPBohsQPw" name="vid_to_delete" type="_ane0QJFMEeWIpOPBohsQPw"/>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_5jxNoJFJEeWIpOPBohsQPw" name="TvRecordingService">
+      <ownedAttribute xmi:id="_a6GjYJFOEeWIpOPBohsQPw" name="list_of_tv_recordings"/>
+      <ownedOperation xmi:id="_HcsaYJFMEeWIpOPBohsQPw" name="list_tv_recordings"/>
+      <ownedOperation xmi:id="_JZXicJFMEeWIpOPBohsQPw" name="delete_tv_recording">
+        <ownedParameter xmi:id="_KsHjwJFMEeWIpOPBohsQPw" name="tv_recording_to_delete" type="_VoH-UJFMEeWIpOPBohsQPw"/>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_p3RtUJFOEeWIpOPBohsQPw" name="StorageGroupService">
+      <ownedAttribute xmi:id="_tIwFIJFOEeWIpOPBohsQPw" name="list_of_storage_group"/>
+      <ownedOperation xmi:id="_viY2AJFOEeWIpOPBohsQPw" name="directory_for_name">
+        <ownedParameter xmi:id="_ziKeQJFOEeWIpOPBohsQPw" name="storage_group_name">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedParameter>
+        <ownedParameter xmi:id="_5BLEoJFOEeWIpOPBohsQPw" name="directory" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedParameter>
+      </ownedOperation>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_XUW0cJE9EeWIpOPBohsQPw" name="Data Transport">
+    <packagedElement xmi:type="uml:Class" xmi:id="_VoH-UJFMEeWIpOPBohsQPw" name="TvRecording">
+      <ownedOperation xmi:id="_HegwkJFSEeWIpOPBohsQPw" name="delete"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_ane0QJFMEeWIpOPBohsQPw" name="Video">
+      <ownedOperation xmi:id="_3H6VkJFREeWIpOPBohsQPw" name="update">
+        <ownedParameter xmi:id="_4XlNsJFREeWIpOPBohsQPw" name="metadata"/>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_u3iXoJFNEeWIpOPBohsQPw" name="StorageGroup">
+      <ownedAttribute xmi:id="_xK_oAJFNEeWIpOPBohsQPw" name="name">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_47nEoJFNEeWIpOPBohsQPw" name="host">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_80Nt4JFNEeWIpOPBohsQPw" name="directory">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedAttribute>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_e5rnEJE9EeWIpOPBohsQPw" name="Data Access">
+    <packagedElement xmi:type="uml:Class" xmi:id="_r8nMsJFPEeWIpOPBohsQPw" name="MythApi"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_yRZkgJFPEeWIpOPBohsQPw" name="TvRecordingApi"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_3m9T8JFPEeWIpOPBohsQPw" name="VidApi"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_7FWtcJFPEeWIpOPBohsQPw" name="StorageGroupApi"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_NAvU8JFQEeWIpOPBohsQPw" name="VidDao"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_kdrbIJE9EeWIpOPBohsQPw" name="Business Logic">
+    <packagedElement xmi:type="uml:Package" xmi:id="_pH2rQJE9EeWIpOPBohsQPw" name="Views"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_bKWpEJFSEeWIpOPBohsQPw" name="Presentation">
+    <packagedElement xmi:type="uml:Package" xmi:id="_4O-bYJE9EeWIpOPBohsQPw" name="Templates"/>
+    <packagedElement xmi:type="uml:Package" xmi:id="_1Y1UsJE9EeWIpOPBohsQPw" name="Urls"/>
+  </packagedElement>
+</uml:Model>

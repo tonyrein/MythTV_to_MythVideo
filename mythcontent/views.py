@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 
-from .mythapi import MythApi
-from .dto import myth_video, storage_group, tv_recording
+from .mythapi import MythApi, tv_recording
+
+
 # Create your views here.
 
 """
