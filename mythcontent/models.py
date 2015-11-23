@@ -37,7 +37,7 @@ The normal flow would be:
    timezone.make_aware(d,pytz.timezone('UTC')
    v.insertdate = d
 """
-class VideoDao(models.Model):
+class VideoDaoOrig(models.Model):
     intid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128)
     subtitle = models.TextField()
