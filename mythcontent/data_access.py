@@ -93,21 +93,16 @@ class StorageGroupApi(object):
         if StorageGroupApi.__instance is None:
             StorageGroupApi.__instance = object.__new__(cls)
             StorageGroupApi.__instance.api = MythApi(server_name, server_port)
-            StorageGroupApi.__instance.storage_groups = StorageGroupApi.__instance._get_myth_storage_group_list()
+            StorageGroupApi.__instance._storage_groups = None #= StorageGroupApi.__instance._get_myth_storage_group_list()
         return StorageGroupApi.__instance
     """
     Gets list of storage groups available to
     MythTV server self.server_name.
      Pass: self
-     Return: list, each element of which is
-     a (host, name, directory) namedtuple.
-     On failure, or if there are no storage groups, returns empty list.
+     Return: list, each element of which is an ordereddict with the following keys:
+       Id,  GroupName,  HostName,  DirName
     """
-    def _get_myth_storage_group_list(self):
+    def _fill_myth_storage_group_list(self):
         sgxml = self.api._call_myth_api('Myth', 'GetStorageGroupDirs')
-        sgdirs = sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
-        retlist = []
-        for sg in sgdirs:
-            retlist.append([ sg['HostName'],sg['GroupName'],sg['DirName'] ])
-        return retlist
-    
+        return sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
+        
