@@ -15,7 +15,14 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-from nonpublic.settings import DEV_DB, DEV_DB_HOST, DEV_DB_PASSWORD, DEV_DB_USER, DEV_KEY
+#from nonpublic.settings import DEV_DB, DEV_DB_HOST, DEV_DB_PASSWORD, DEV_DB_USER, DEV_KEY, DEV_API_SERVER, DEV_API_PORT
+from nonpublic.settings import DEV_API, DEV_DB, DEV_KEY
+
+
+API_SERVER = DEV_API['SERVER']
+API_PORT = DEV_API['PORT']
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -77,17 +84,19 @@ WSGI_APPLICATION = 'MythTV_to_MythVideo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
     'mythcopy': {
-        'NAME': DEV_DB,
+        'NAME': DEV_DB['DB_NAME'],
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': DEV_DB_HOST,
-        'USER': DEV_DB_USER,
-        'PASSWORD': DEV_DB_PASSWORD,
+        'HOST': DEV_DB['HOST'],
+        'USER': DEV_DB['USER'],
+        'PASSWORD': DEV_DB['PASSWORD'],
     }
 }
 

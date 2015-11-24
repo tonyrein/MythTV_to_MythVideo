@@ -1,6 +1,7 @@
 import urllib.request
 import xmltodict
 from django.db import models
+from django.conf import settings
 '''
 Created on Nov 22, 2015
 
@@ -22,7 +23,7 @@ this class is a singleton.
 '''
 class MythApi(object):
     __instance = None
-    def __new__(cls, server_name='mythbackend1', server_port=6544):
+    def __new__(cls, server_name=settings.API_SERVER, server_port=settings.API_PORT):
         if MythApi.__instance is None:
             MythApi.__instance = object.__new__(cls)
             MythApi.__instance.server_name = server_name
@@ -77,14 +78,17 @@ class MythApi(object):
         return self._storage_groups    
     
     """
-    Pass: Storage group name
+    Pass:
+        * Storage group name
+        * (Optional) host name
+        If host name is None, use settings.API_SERVER
     Return: Disk directory, or None if no match.
     
     Assumes: host is same as self.server_name
     """
-    def storage_dir_for_name(self, group_name):
+    def storage_dir_for_name(self, group_name, hostname=settings.API_SERVER):
         for g in self.storage_groups:
-            if g[1] == group_name and g[2] == self.server_name:
+            if g[1] == group_name and g[2] == hostname:
                 return g[3]
         return None         
 
@@ -164,32 +168,32 @@ class TvRecordingApi(object):
             self._tv_recordings = self.__fill_myth_tv_recording_list()
         return self._tv_recordings
         
-class StorageGroupApi(object):
-    __instance = None # class attribute
-    __api_service_name = 'Myth'
-    def __new__(cls, server_name='mythbackend1', server_port=6544):
-        if StorageGroupApi.__instance is None:
-            StorageGroupApi.__instance = object.__new__(cls)
-            StorageGroupApi.__instance.api = MythApi(server_name, server_port)
-            StorageGroupApi.__instance._storage_groups = None
-        return StorageGroupApi.__instance
-#     """
-#     Gets list of storage groups available to
-#     MythTV server self.server_name.
-#      Pass: self
-#      Return: list, each element of which is an ordereddict with the following keys:
-#        Id,  GroupName,  HostName,  DirName
-#     """
-#     def _fill_myth_storage_group_list(self):
-#         sgxml = self.api._call_myth_api(StorageGroupApi.__api_service_name, 'GetStorageGroupDirs')
-#         return sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
+# class StorageGroupApi(object):
+#     __instance = None # class attribute
+#     __api_service_name = 'Myth'
+#     def __new__(cls, server_name='mythbackend1', server_port=6544):
+#         if StorageGroupApi.__instance is None:
+#             StorageGroupApi.__instance = object.__new__(cls)
+#             StorageGroupApi.__instance.api = MythApi(server_name, server_port)
+#             StorageGroupApi.__instance._storage_groups = None
+#         return StorageGroupApi.__instance
+# #     """
+# #     Gets list of storage groups available to
+# #     MythTV server self.server_name.
+# #      Pass: self
+# #      Return: list, each element of which is an ordereddict with the following keys:
+# #        Id,  GroupName,  HostName,  DirName
+# #     """
+# #     def _fill_myth_storage_group_list(self):
+# #         sgxml = self.api._call_myth_api(StorageGroupApi.__api_service_name, 'GetStorageGroupDirs')
+# #         return sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
+# #     
+#     @property
+#     def storage_groups(self):
+#         if self._storage_groups is None:
+#             self._storage_groups = self._fill_myth_storage_group_list()
+#         return self._storage_groups
 #     
-    @property
-    def storage_groups(self):
-        if self._storage_groups is None:
-            self._storage_groups = self._fill_myth_storage_group_list()
-        return self._storage_groups
-    
 """
 VideoDao is a Django ORM model class
 """
