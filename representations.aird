@@ -157,7 +157,7 @@
                 <element xsi:nil="true"/>
                 <layoutConstraint xmi:type="notation:Bounds" xmi:id="_YkhhM5FQEeWIpOPBohsQPw" x="304" y="6" width="253" height="107"/>
               </children>
-              <children xmi:type="notation:Shape" xmi:id="_2FdPgJFQEeWIpOPBohsQPw" type="Note" fontName="Oxygen-Sans Sans-Book" description="VidDao encapsulates the code to interact with the MythTV MySQL database. It's probably an ORM model class." fillColor="13369343" transparency="0" lineColor="6737151" lineWidth="1">
+              <children xmi:type="notation:Shape" xmi:id="_2FdPgJFQEeWIpOPBohsQPw" type="Note" fontName="Oxygen-Sans Sans-Book" description="VideoDao encapsulates the code to interact with the MythTV MySQL database. It's probably an ORM model class." fillColor="13369343" transparency="0" lineColor="6737151" lineWidth="1">
                 <children xmi:type="notation:BasicDecorationNode" xmi:id="_2FfEsJFQEeWIpOPBohsQPw" type="DiagramName">
                   <element xsi:nil="true"/>
                 </children>
