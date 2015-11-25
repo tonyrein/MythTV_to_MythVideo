@@ -1,7 +1,10 @@
 import urllib.request
 import xmltodict
+
 from django.db import models
 from django.conf import settings
+
+from mythcontent.utils import time_diff_from_strings
 '''
 Created on Nov 22, 2015
 
@@ -88,8 +91,8 @@ class MythApi(object):
     """
     def storage_dir_for_name(self, group_name, hostname=settings.API_SERVER):
         for g in self.storage_groups:
-            if g[1] == group_name and g[2] == hostname:
-                return g[3]
+            if g['GroupName'] == group_name and g['HostName'] == hostname:
+                return g['DirName']
         return None         
 
 class VideoApi(object):
@@ -131,7 +134,7 @@ class VideoApi(object):
 class TvRecordingApi(object):
     __instance = None # class attribute
     __api_service_name = 'Dvr'
-    def __new__(cls, server_name='mythbackend1', server_port=6544):
+    def __new__(cls):
         if TvRecordingApi.__instance is None:
             TvRecordingApi.__instance = object.__new__(cls)
             TvRecordingApi.__instance.api = MythApi()
@@ -145,7 +148,8 @@ class TvRecordingApi(object):
        StartTime, EndTime, Title, SubTitle, Category, CatType, Repeat, VideoProps,
        AudioProps, SubProps, SeriesId, ProgramId, Stars, FileSize, LastModified, ProgramFlags,
        FileName, HostName, Airdate, Description, Inetref, Season, Episode, Channel,
-       Recording, Artwork
+       Recording, Artwork,
+       FileSpec, Duration
        Note that the values for several of these keys (Channel, Recording, Artwork) are
        ordereddicts in turn.
        For Channel, the keys are:
@@ -157,10 +161,31 @@ class TvRecordingApi(object):
         Status,  Priority,  StartTs,  EndTs,  RecordId,  RecGroup,  PlayGroup,  StorageGroup,  RecType,  DupInType,  DupMethod,  EncoderId,  Profile
       For Artwork, the one key is:
         ArtworkInfos
+        
+      The 'FileSpec' and 'Duration' keys/values are calculated by this method and added on to
+      the value returned by the Myth API call.
+      
+      The 'StartTs' and 'EndTs' fields are used to calculate the duration -- these represent the
+      actual start and end times of the recording; the fields 'StartTime' and 'EndTime' are the
+      scheduled times, and do not reflect the fact that the recording may have started and/or
+      ended at other than the scheduled times.
+      
     """
     def __fill_myth_tv_recording_list(self):
-        prog_dict = self._call_myth_api(TvRecordingApi.__api_service_name, 'GetRecordedList')
-        return prog_dict['ProgramList']['Programs']['Program']
+        prog_dict = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'GetRecordedList')
+        api_fields = prog_dict['ProgramList']['Programs']['Program']
+        ret_list = []
+        if api_fields and len(api_fields) > 0:
+            for line in api_fields:
+                sdir = self.api.storage_dir_for_name(
+                    line['Recording']['StorageGroup'], hostname=line['HostName']
+                    )
+                line['FileSpec'] = sdir + line['FileName']
+                line['Duration'] = time_diff_from_strings(
+                    line['Recording']['StartTs'], line['Recording']['EndTs']
+                    )
+                ret_list.append(line)
+        return ret_list
         
     @property
     def tv_recordings(self):
@@ -168,32 +193,7 @@ class TvRecordingApi(object):
             self._tv_recordings = self.__fill_myth_tv_recording_list()
         return self._tv_recordings
         
-# class StorageGroupApi(object):
-#     __instance = None # class attribute
-#     __api_service_name = 'Myth'
-#     def __new__(cls, server_name='mythbackend1', server_port=6544):
-#         if StorageGroupApi.__instance is None:
-#             StorageGroupApi.__instance = object.__new__(cls)
-#             StorageGroupApi.__instance.api = MythApi(server_name, server_port)
-#             StorageGroupApi.__instance._storage_groups = None
-#         return StorageGroupApi.__instance
-# #     """
-# #     Gets list of storage groups available to
-# #     MythTV server self.server_name.
-# #      Pass: self
-# #      Return: list, each element of which is an ordereddict with the following keys:
-# #        Id,  GroupName,  HostName,  DirName
-# #     """
-# #     def _fill_myth_storage_group_list(self):
-# #         sgxml = self.api._call_myth_api(StorageGroupApi.__api_service_name, 'GetStorageGroupDirs')
-# #         return sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
-# #     
-#     @property
-#     def storage_groups(self):
-#         if self._storage_groups is None:
-#             self._storage_groups = self._fill_myth_storage_group_list()
-#         return self._storage_groups
-#     
+
 """
 VideoDao is a Django ORM model class
 """
