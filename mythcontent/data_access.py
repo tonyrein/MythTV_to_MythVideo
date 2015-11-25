@@ -186,6 +186,17 @@ class TvRecordingApi(object):
                     )
                 ret_list.append(line)
         return ret_list
+    
+    """
+    Call MythTV api to remove this recording. If successful,
+    remove the recording from our internal list.
+    
+    """
+    def erase(self, channel_id, start_time):
+        call_result = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'DeleteRecording',
+                                channel_id, start_time)
+        return call_result
+        
         
     @property
     def tv_recordings(self):

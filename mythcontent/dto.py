@@ -10,7 +10,10 @@ class TvRecording(object):
         self.prog = prog
     
     def erase(self):
-        pass
+        channel_id = self.prog['Channel']['ChanId']
+        start_time = self.prog['Recording']['StartTs']
+        api = TvRecordingApi()
+        return api.erase(channel_id, start_time)
         
             
 """
