@@ -20,7 +20,7 @@ wrapped in a TvRecording object.
 
 In Java, this would probably be a static class.
 """
-def list_recordings(self):
+def list_recordings():
     api = TvRecordingApi()
     return [ TvRecording(p) for p in api.tv_recordings ]             
 
