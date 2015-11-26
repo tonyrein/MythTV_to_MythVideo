@@ -6,4 +6,4 @@ class TvRecordingService:
         return mythcontent.dto.list_recordings()
     
     def delete_recording(self, recording_to_delete):
-        pass
+        return recording_to_delete.erase()

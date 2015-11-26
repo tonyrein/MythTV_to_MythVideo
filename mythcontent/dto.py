@@ -9,11 +9,50 @@ class TvRecording(object):
     def __init__(self, prog):
         self.prog = prog
     
+    # some properties, for convenience:
+    @property
+    def title(self):
+        return self.prog['Title']
+    
+    @property
+    def filespec(self):
+        return self.prog['FileSpec']
+    
+    @property
+    def subtitle(self):
+        return self.prog['SubTitle']
+    
+    @property
+    def filesize(self):
+        return self.prog['FileSize']
+    
+    @property
+    def duration(self):
+        return self.prog['Duration']
+    
+    @property
+    def start_at(self):
+        return self.prog['Recording']['StartTs']
+    
+    @property
+    def end_at(self):
+        return self.prog['Recording']['EndTs']
+    
+    @property
+    def hostname(self):
+        return self.prog['HostName']
+    """
+    Call the MythTV API to delete this
+    recording.
+    Pass:
+      * self
+    Returns:
+      * True if successful, False if call failed (no such
+      recording, for example)
+    """
     def erase(self):
-        channel_id = self.prog['Channel']['ChanId']
-        start_time = self.prog['Recording']['StartTs']
         api = TvRecordingApi()
-        return api.erase(channel_id, start_time)
+        return api.erase(self.prog)
         
             
 """

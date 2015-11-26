@@ -38,12 +38,12 @@ class MythApi(object):
     Pass:
       * name of API service
       * name of API call within service
-      * data (optional)
+      * data (optional) - a dict of parameters for the call
       * headers (optional)
     Returns:
       * An ordereddict created by parsing the XML returned from the MythTV server
     """
-    def _call_myth_api(self,service_name, call_name, data=None, headers=None):
+    def _call_myth_api(self,service_name, call_name, data=None, headers={}):
         # urlopen doesn't always work if headers is None:
         if headers is None:
             headers = {}
@@ -51,13 +51,22 @@ class MythApi(object):
         if 'Accept' in headers:
             if headers['Accept'] in [ 'text/javascript', 'application/json' ]:
                 del headers['Accept']
+        
+        if data:
+            DATA=urllib.parse.urlencode(data)
+            DATA=DATA.encode('utf-8')
+        else:
+            DATA=None
+        
         # Assemble url:
         url = (
             "http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
             )
         # Make a Request object and pass it to the server.
         # Use the returned result to make some XML to return to our caller
-        req = urllib.request.Request(url, data, headers)
+        req = urllib.request.Request(url, data=DATA, headers=headers)
+        if DATA:
+            req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
         with urllib.request.urlopen(req) as response:
             the_answer = response.read()
             return xmltodict.parse(the_answer)
@@ -74,7 +83,8 @@ class MythApi(object):
         return sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
     
     """
-    storage_groups() is a property because it's read-only.
+    storage_groups() is a property because
+         it's read-only.
     """
     @property
     def storage_groups(self):
@@ -191,11 +201,39 @@ class TvRecordingApi(object):
     Call MythTV api to remove this recording. If successful,
     remove the recording from our internal list.
     
+    Pass:
+      * Ordered Dict: the program to delete
+      (an element of self._tv_recordings) 
+    Return:
+      * True if call succeeds, False if it fails
+      (no such recording, for example)
+      
+      Note that if the recording has already been marked
+      as deleted in MythTV, this method will still return
+      True. This might occur if there has been a previous
+      call to this method, causing MythTV to mark the recording
+      as deleted, but MythTV has not yet done the actual
+      erasure.
+    Side Effect:
+      * If the call succeeds, this recording will be removed
+      from self._tv_recordings.
     """
-    def erase(self, channel_id, start_time):
-        call_result = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'DeleteRecording',
-                                channel_id, start_time)
-        return call_result
+    def erase(self, prog):
+        DATA = {'ChanId': prog['Channel']['ChanId'], 'StartTime': prog['Recording']['StartTs'] }
+        call_result = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'RemoveRecorded',
+                                data=DATA)
+        if call_result['bool'] == 'true':
+            # This might throw an exception if this method is
+            # called in a multi-threaded environment and someone else
+            # deletes this list element before we get to it.
+            # If so, no problem, so ignore it.
+            try:
+                self._tv_recordings.remove(prog)
+            except:
+                pass
+            return True
+        else:
+            return False
         
         
     @property
