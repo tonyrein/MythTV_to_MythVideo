@@ -1,0 +1,28 @@
+What has to happen to transfer a program from MythTV to MythVideo:
+
+1. Copy the file from the program's storage directory to the Videos storage directory.
+2. If step 1 succeeded, call the API::Video/AddVideo to tell MythVideo about the file.
+3. If step 2 succeeded, add metadata (title, subtitle, year, contenttype...)
+
+Step 1 can be done with shutil.copy() or shutil.copy2(). The source is the recording's filespec property.
+The destination is the Videos storage directory + the recording's filename property.
+The shutil methods return the destination path if successful; otherwise they raise an exception.
+
+The Video/AddVideo call returns { 'bool':'true' } if it succeeds. Assuming that it
+does succeed, then we can go to Step 3. Step 3 will need to be done with a database
+call (i.e., with an ORM Model) since the API doesn't expose any methods to set
+metadata the way we want to do.
+
+So, we retrieve from the database the row that was created by the API call in step 2. We
+do this by filtering on the file name and host name:
+vlist = VideoDao.objects.filter(filename='Baseball/Home_Run_Derby-July_13_2015/Home-Run_Derby-July_13_2015.mpg').filter(host='mythbackend1')
+if len(vlist) != 1:
+	# uh oh -- problem
+	raise('Could not find video')
+v = vlist[0]
+v.title='2015 Home Run Derby' # from prog.title
+v.subtitle='July 13, 2015 -- Great American Ballpark. Todd Frazier Lights Up the House!' # from prog.subtitle
+v.year=...
+v.contenttype='TELEVISION'
+v.save() # May need to massage format of v.insertdate prior to save -- will need to be time-zone aware
+

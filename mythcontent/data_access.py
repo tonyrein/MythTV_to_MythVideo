@@ -32,6 +32,8 @@ class MythApi(object):
             MythApi.__instance.server_name = server_name
             MythApi.__instance.server_port = server_port
             MythApi.__instance._storage_groups = MythApi.__instance._fill_myth_storage_group_list()
+            MythApi.__instance.video_directory = MythApi.__instance.storage_dir_for_name(self, 'Videos')
+            MythApi.__instance.default_directory = MythApi.__instance.storage_dir_for_name(self, 'Default')
         return MythApi.__instance
     """
     Make a call to the MythTV API and request XML back from MythTV server.
@@ -226,7 +228,7 @@ class TvRecordingApi(object):
             # This might throw an exception if this method is
             # called in a multi-threaded environment and someone else
             # deletes this list element before we get to it.
-            # If so, no problem, so ignore it.
+            # However, it does not present a problem, so ignore it.
             try:
                 self._tv_recordings.remove(prog)
             except:
