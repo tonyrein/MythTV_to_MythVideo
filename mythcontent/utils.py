@@ -24,4 +24,4 @@ Return:
 def time_diff_from_strings(start_time, end_time):
     end_dt = iso8601.parse_date(end_time, pytz.timezone('Etc/UTC'))
     start_dt = iso8601.parse_date(start_time, pytz.timezone('Etc/UTC'))
-    return end_dt.timestamp() - start_dt.timestamp()
+    return (int)(end_dt.timestamp() - start_dt.timestamp())

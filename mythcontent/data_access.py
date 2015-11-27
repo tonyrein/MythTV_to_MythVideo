@@ -32,8 +32,8 @@ class MythApi(object):
             MythApi.__instance.server_name = server_name
             MythApi.__instance.server_port = server_port
             MythApi.__instance._storage_groups = MythApi.__instance._fill_myth_storage_group_list()
-            MythApi.__instance.video_directory = MythApi.__instance.storage_dir_for_name(self, 'Videos')
-            MythApi.__instance.default_directory = MythApi.__instance.storage_dir_for_name(self, 'Default')
+            MythApi.__instance.video_directory = MythApi.__instance.storage_dir_for_name('Videos')
+            MythApi.__instance.default_directory = MythApi.__instance.storage_dir_for_name('Default')
         return MythApi.__instance
     """
     Make a call to the MythTV API and request XML back from MythTV server.
