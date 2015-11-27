@@ -114,6 +114,8 @@ class VideoApi(object):
         if VideoApi.__instance is None:
             VideoApi.__instance = object.__new__(cls)
             VideoApi.__instance.api = MythApi()
+            VideoApi.__instance.storage_directory = VideoApi.__instance.api.video_directory
+            VideoApi.__instance.host = VideoApi.__instance.api.server_name
             VideoApi.__instance._videos = None 
         return VideoApi.__instance
     
