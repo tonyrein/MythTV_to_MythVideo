@@ -8,6 +8,39 @@ Step 1 can be done with shutil.copy() or shutil.copy2(). The source is the recor
 The destination is the Videos storage directory + the recording's filename property.
 The shutil methods return the destination path if successful; otherwise they raise an exception.
 
+An alternate way of doing Step 1 is via SSH. Use the 'paramiko' library to construct and execute
+the SSH commands on the server containing the TV recording. For example:
+	
+	import paramiko
+	import os
+	from mythcontent.dto import Video, TvRecording
+	from nonpublic.settings import SSH_INFOS
+	source_host = prog.hostname
+	source_filespec = prog.filespec
+	vid = Video()
+	dest_dir = vid.video_directory + p.title.replace(' ','_') + os.sep
+	dest_host = vid.host_name
+	ssh_client = paramiko.SSHClient()
+	ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	port = (SSH_INFOS[hostname]).get('port', '22')
+	ssh_client.connect(
+		source_host,
+		username=SSH_INFOS[hostname][user],
+		password=SSH_INFOS[hostname][password],
+		port=port,
+		allow_agent=False,
+		look_for_keys=False
+		)
+	mkdir_command = 'mkdir -p {}'.format(dest_dir)
+	copy_command = 'cp -v {} {}'.format(source_filespec,dest_dir)
+	stdin,stdout,stderr=ssh.exec_command(mkdir_command)
+	stdout.readlines()
+	stdin,stdout,stderr=ssh.exec_command(copy_command)
+	stdout.readlines()
+
+(The above example assumes that the source host and destination host are the same.)
+
+
 The Video/AddVideo call returns { 'bool':'true' } if it succeeds. Assuming that it
 does succeed, then we can go to Step 3. Step 3 will need to be done with a database
 call (i.e., with an ORM Model) since the API doesn't expose any methods to set

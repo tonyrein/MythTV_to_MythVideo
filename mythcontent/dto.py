@@ -19,6 +19,9 @@ class TvRecording(object):
         return self.prog['FileSpec']
     
     @property
+    def filename(self):
+        return self.prog['FileName']
+    @property
     def subtitle(self):
         return self.prog['SubTitle']
     
@@ -68,4 +71,17 @@ def list_recordings():
 
 
 class Video(object):
-    pass
+    def __init__(self, prog=None):
+        self._api = VideoApi()
+        self.video_directory = self._api.video_directory
+        self.hostname = self._api.server_name
+        self.prog = prog
+        
+        
+        
+    def add_to_mythvideo(self):
+        if self.prog is None:
+            raise ValueError('prog should not be None in add_to_mythvideo()')
+        return self._api.add_to_mythvideo(self.prog.filename, self.hostname)
+        
+        
