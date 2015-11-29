@@ -87,7 +87,19 @@ class VideoService(object):
         if self.in_mythvideo(relative_filespec):
             raise Exception("MythVideo already contains {}".format(relative_filespec))
         # Since it's not already there, add it. First step is to copy the file:
-        dest_dir = VideoApi().video_directory + recording.title + os.sep
+        api = VideoApi()
+        dest_dir = api.video_directory + recording.title + os.sep
+        copy_file_on_remote_host(recording.hostname, recording.filespec, dest_dir)
+        # After physical file is in place, tell MythVideo about it:
+        res = api.add_to_mythvideo(relative_filespec, recording.hostname)
+        if res != True:
+            raise Exception('Unknown failure adding {} to MythVideo'.format(recording.title))
+        # Now add it to this VideoService object's list:
+        res = api.find_in_mythvideo(relative_filespec)
+        if res is None:
+            raise Exception('Unknown failure adding {} to MythVideo'.format(recording.title))
+        self.videos.append(Video(res))
+        return True
         
         
 
