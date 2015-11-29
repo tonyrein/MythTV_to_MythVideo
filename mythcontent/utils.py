@@ -2,6 +2,10 @@ import iso8601
 from django.utils import timezone
 import pytz
 
+import paramiko
+
+from nonpublic.settings import SSH_INFOS
+
 """
 convenience method to convert a date/time
 string from UTC to local
@@ -25,3 +29,25 @@ def time_diff_from_strings(start_time, end_time):
     end_dt = iso8601.parse_date(end_time, pytz.timezone('Etc/UTC'))
     start_dt = iso8601.parse_date(start_time, pytz.timezone('Etc/UTC'))
     return (int)(end_dt.timestamp() - start_dt.timestamp())
+
+"""
+Execute a 'cp -v...' command on a remote host by means of paramiko.
+"""
+def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
+    sshinf = SSH_INFOS[hostname]
+    user = sshinf['username']
+    pword = sshinf['password']
+    port = sshinf.get('port', 22)
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(
+        hostname, username=user,password=pword,port=port,
+        allow_agent=False, look_for_keys=False
+        )
+    mkdir_cmd = 'mkdir -p {}'.format(destination_dir)
+    copy_cmd = 'cp -v {} {}'.format(source_filespec, destination_dir)
+    stdin,stdout,stderr=ssh_client.exec_command(mkdir_cmd)
+    stdout.readlines()
+    stdin,stdout,stderr=ssh_client.exec_command(copy_cmd)
+    stdout.readlines()
+

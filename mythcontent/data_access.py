@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import urllib.request
 import xmltodict
 
@@ -32,7 +33,6 @@ class MythApi(object):
             MythApi.__instance.server_name = server_name
             MythApi.__instance.server_port = server_port
             MythApi.__instance._storage_groups = MythApi.__instance._fill_myth_storage_group_list()
-            MythApi.__instance.video_directory = MythApi.__instance.storage_dir_for_name('Videos')
             MythApi.__instance.default_directory = MythApi.__instance.storage_dir_for_name('Default')
         return MythApi.__instance
     """
@@ -44,6 +44,8 @@ class MythApi(object):
       * headers (optional)
     Returns:
       * An ordereddict created by parsing the XML returned from the MythTV server
+    Raises:
+      * HTTPError
     """
     def _call_myth_api(self,service_name, call_name, data=None, headers={}):
         # urlopen doesn't always work if headers is None:
@@ -69,10 +71,13 @@ class MythApi(object):
         req = urllib.request.Request(url, data=DATA, headers=headers)
         if DATA:
             req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
-        with urllib.request.urlopen(req) as response:
-            the_answer = response.read()
-            return xmltodict.parse(the_answer)
         
+        try:
+            with urllib.request.urlopen(req) as response:
+                the_answer = response.read()
+                return xmltodict.parse(the_answer)
+        except Exception as e:
+            return OrderedDict( { 'Exception': e } )
     """
     Gets list of storage groups available to
     MythTV server self.server_name.
@@ -114,12 +119,27 @@ class VideoApi(object):
         if VideoApi.__instance is None:
             VideoApi.__instance = object.__new__(cls)
             VideoApi.__instance.api = MythApi()
-            VideoApi.__instance.storage_directory = VideoApi.__instance.api.video_directory
-            VideoApi.__instance.host = VideoApi.__instance.api.server_name
-            VideoApi.__instance._videos = None 
+            VideoApi.__instance._videos = None
+            VideoApi.__instance.video_directory = VideoApi.__instance.api.storage_dir_for_name('Videos')
+            VideoApi.__instance.server_name = VideoApi.__instance.api.server_name 
         return VideoApi.__instance
     
-    
+    def add_to_mythvideo(self, filename, hostname=None):
+        if hostname is None:
+            hostname = self.server_name
+        res_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'AddVideo',
+                 { 'FileName': filename, 'HostName': hostname} )
+        return res_dict['bool'] == 'true'
+        
+    def find_in_mythvideo(self, filename, hostname=None):
+        if hostname is None:
+            hostname = self.server_name
+        res_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'GetVideoByFileName',
+                 { 'FileName': filename } )
+        if 'Exception' in res_dict:
+            return None
+        else:
+            return res_dict['VideoMetadataInfo']
 
     """
     Queries the MythAPI server for a list of the contents of MythVideo.
