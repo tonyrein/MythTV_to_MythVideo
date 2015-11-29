@@ -42,6 +42,10 @@ class TvRecording(object):
         return self.prog['Recording']['EndTs']
     
     @property
+    def airdate(self):
+        return self.prog['Airdate']
+    
+    @property
     def hostname(self):
         return self.prog['HostName']
     """

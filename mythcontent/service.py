@@ -1,7 +1,7 @@
 import os
 
 from mythcontent.dto import TvRecording, Video
-from mythcontent.data_access import TvRecordingApi, VideoApi
+from mythcontent.data_access import TvRecordingApi, VideoApi, VideoDao
 from mythcontent.utils import copy_file_on_remote_host
 
 class TvRecordingService(object):
@@ -101,6 +101,17 @@ class VideoService(object):
         self.videos.append(Video(res))
         return True
         
+    def update_metadata_from_tv_recording(self,recording):
+        relative_filespec = recording.title + os.sep + recording.filename
+        # following line should return a list of only 1:
+        vid_list = VideoDao.objects.filter(filename=relative_filespec)
+        if len(vid_list) != 1:
+            raise Exception('Could not find {} - {} in database.'.format(recording.title,recording.subtitle))
+        dao = vid_list[0]
+        dao.title = recording.title
+        dao.subtitle = recording.subtitle
+        dao.contenttype='TELEVISION'
+        orig_aired = recording.airdate
         
 
     @property
