@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import urllib.request
 import xmltodict
 
@@ -43,6 +44,8 @@ class MythApi(object):
       * headers (optional)
     Returns:
       * An ordereddict created by parsing the XML returned from the MythTV server
+    Raises:
+      * HTTPError
     """
     def _call_myth_api(self,service_name, call_name, data=None, headers={}):
         # urlopen doesn't always work if headers is None:
@@ -68,10 +71,13 @@ class MythApi(object):
         req = urllib.request.Request(url, data=DATA, headers=headers)
         if DATA:
             req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
-        with urllib.request.urlopen(req) as response:
-            the_answer = response.read()
-            return xmltodict.parse(the_answer)
         
+        try:
+            with urllib.request.urlopen(req) as response:
+                the_answer = response.read()
+                return xmltodict.parse(the_answer)
+        except Exception as e:
+            return OrderedDict( { 'Exception': e } )
     """
     Gets list of storage groups available to
     MythTV server self.server_name.
@@ -125,7 +131,15 @@ class VideoApi(object):
                  { 'FileName': filename, 'HostName': hostname} )
         return res_dict['bool'] == 'true'
         
-    
+    def find_in_mythvideo(self, filename, hostname=None):
+        if hostname is None:
+            hostname = self.server_name
+        res_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'GetVideoByFileName',
+                 { 'FileName': filename } )
+        if 'Exception' in res_dict:
+            return None
+        else:
+            return res_dict['VideoMetadataInfo']
 
     """
     Queries the MythAPI server for a list of the contents of MythVideo.
