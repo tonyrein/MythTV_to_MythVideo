@@ -1,4 +1,5 @@
 import os
+import iso8601
 
 from mythcontent.dto import TvRecording, Video
 from mythcontent.data_access import TvRecordingApi, VideoApi, VideoDao
@@ -51,29 +52,16 @@ class VideoService(object):
             return v in self.videos
         else: # assume it's a filename
             return v in [ n.filename for n in self.videos ]
-        
-    def add_to_mythvideo(self,filename):
-        # already in our list?
-        if filename in self.videos:
-            raise Exception('File already in VideoService videos list.')
-        # Is it already in MythVideo's content?
-        v = None
-        api = VideoApi()
-        res = api.find_in_mythvideo(filename)
-        if res is not None:
-            # Already there -- save the result...
-            v = Video(res)
+    
+    """
+    Given a filename, return a dto.Video object
+    """
+    def video_from_filename(self,filename):
+        vlist = [ v for v in self.videos if  v.filename == filename]
+        if len(vlist) == 0:
+            return None
         else:
-            # try adding it...
-            if api.add_to_mythvideo(filename): # MythTV API added file OK
-                res = api.find_in_mythvideo(filename)
-                if res is not None:
-                    v = Video(res)
-        # If the item is now in MythVideo (whether because
-        # we succeeded in adding it, or because it was already there),
-        # add it to our 'videos' attribute:
-        if v is not None:
-            self.videos.append(v)
+            return vlist[0]  
     
     def in_mythvideo(self, filename):
         return VideoApi().find_in_mythvideo(filename)
@@ -102,16 +90,12 @@ class VideoService(object):
         return True
         
     def update_metadata_from_tv_recording(self,recording):
-        relative_filespec = recording.title + os.sep + recording.filename
-        # following line should return a list of only 1:
-        vid_list = VideoDao.objects.filter(filename=relative_filespec)
-        if len(vid_list) != 1:
-            raise Exception('Could not find {} - {} in database.'.format(recording.title,recording.subtitle))
-        dao = vid_list[0]
-        dao.title = recording.title
-        dao.subtitle = recording.subtitle
-        dao.contenttype='TELEVISION'
-        orig_aired = recording.airdate
+        orig_aired = iso8601.parse_date(recording.airdate)
+        year = orig_aired.year
+        v = self.video_from_filename(recording.title + os.sep + recording.filename)
+        if v is None:
+            raise Exception("Could not find video with title {} and filename {}".format(recording.title, recording.filename))
+        v.set_metadata(recording.title, recording.subtitle, year, recording.airdate)
         
 
     @property

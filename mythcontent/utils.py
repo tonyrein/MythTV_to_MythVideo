@@ -7,13 +7,21 @@ import paramiko
 from nonpublic.settings import SSH_INFOS
 
 """
+Convert a string in iso8601 format representing
+a UTC date/time into a timezone-aware datetime object.
+"""
+def iso_to_tz_aware(dtstr):
+    d = iso8601.parse_date(dtstr, 'Etc/UTC' )
+    if not timezone.is_aware(d):
+        d = timezone.make_aware(d, pytz.timezone('Etc/UTC'))
+    return d
+
+"""
 convenience method to convert a date/time
 string from UTC to local
 """
 def utc_to_local(dtstr):
-    d = iso8601.parse_date(dtstr, 'Etc/UTC')
-    if not timezone.is_aware(d):
-        d = timezone.make_aware(d, pytz.timezone('Etc/UTC'))
+    d = iso_to_tz_aware(dtstr)
     return timezone.localtime(d)
 
 """
@@ -35,7 +43,7 @@ Execute a 'cp -v...' command on a remote host by means of paramiko.
 """
 def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
     sshinf = SSH_INFOS[hostname]
-    user = sshinf['username']
+    user = sshinf['user']
     pword = sshinf['password']
     port = sshinf.get('port', 22)
     ssh_client = paramiko.SSHClient()

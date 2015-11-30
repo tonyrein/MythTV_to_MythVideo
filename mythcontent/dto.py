@@ -1,6 +1,13 @@
+import os
+
+from django.utils import timezone
+
+import iso8601
+import pytz
 
 from mythcontent.data_access import VideoApi, VideoDao, TvRecordingApi
-# from collections import OrderedDict
+from mythcontent.utils import iso_to_tz_aware
+
 """
 This class is responsible for manipulating a single
 MythTV recorded program.
@@ -165,3 +172,19 @@ class Video(object):
     @property
     def hostname(self):
         return self.vid['HostName']
+    
+    def set_metadata(self, title, subtitle, year, release_date, contenttype='TELEVISION'):
+        # following line should return a list of only 1:
+        vid_list = VideoDao.objects.filter(filename=self.filename)
+        if len(vid_list) != 1:
+            raise Exception('Could not find {} - {} in database.'.format(title,subtitle))
+        dao = vid_list[0]
+        dao.title = title
+        dao.subtitle = subtitle
+        dao.contenttype=contenttype
+        dao.year = year
+        # Need to convert insertdate and releasedate to "aware" date/time to
+        # avoid a warning when saving:
+        dao.insertdate = iso_to_tz_aware(dao.insertdate)
+        dao.releasedate = iso_to_tz_aware(release_date)
+        dao.save()
