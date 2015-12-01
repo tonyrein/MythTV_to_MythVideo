@@ -2,7 +2,7 @@ import os
 import iso8601
 
 from mythcontent.dto import TvRecording, Video
-from mythcontent.data_access import TvRecordingApi, VideoApi, VideoDao
+from mythcontent.data_access import TvRecordingApi, VideoApi
 from mythcontent.utils import copy_file_on_remote_host
 
 class TvRecordingService(object):
@@ -67,7 +67,8 @@ class VideoService(object):
         return VideoApi().find_in_mythvideo(filename)
         
     def add_video_from_tv_recording(self, recording):
-        relative_filespec = recording.title + os.sep + recording.filename
+        title_dir = recording.title.replace(' ','_') + os.sep
+        relative_filespec = title_dir + recording.filename
         # Quit if it's already here...
         if relative_filespec in self:
             raise Exception("VideoService already contains {}".format(relative_filespec))
@@ -76,7 +77,7 @@ class VideoService(object):
             raise Exception("MythVideo already contains {}".format(relative_filespec))
         # Since it's not already there, add it. First step is to copy the file:
         api = VideoApi()
-        dest_dir = api.video_directory + recording.title + os.sep
+        dest_dir = api.video_directory + title_dir
         copy_file_on_remote_host(recording.hostname, recording.filespec, dest_dir)
         # After physical file is in place, tell MythVideo about it:
         res = api.add_to_mythvideo(relative_filespec, recording.hostname)
@@ -92,7 +93,8 @@ class VideoService(object):
     def update_metadata_from_tv_recording(self,recording):
         orig_aired = iso8601.parse_date(recording.airdate)
         year = orig_aired.year
-        v = self.video_from_filename(recording.title + os.sep + recording.filename)
+        title_dir = recording.title.replace(' ', '_') + os.sep
+        v = self.video_from_filename(title_dir + recording.filename)
         if v is None:
             raise Exception("Could not find video with title {} and filename {}".format(recording.title, recording.filename))
         v.set_metadata(recording.title, recording.subtitle, year, recording.airdate)

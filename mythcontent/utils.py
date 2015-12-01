@@ -8,10 +8,14 @@ from nonpublic.settings import SSH_INFOS
 
 """
 Convert a string in iso8601 format representing
-a UTC date/time into a timezone-aware datetime object.
+a UTC date/time, or a datetime object into a
+timezone-aware datetime object.
 """
 def iso_to_tz_aware(dtstr):
-    d = iso8601.parse_date(dtstr, 'Etc/UTC' )
+    if isinstance(dtstr, str):
+        d = iso8601.parse_date(dtstr, pytz.timezone('Etc/UTC') )
+    else:
+        d = dtstr
     if not timezone.is_aware(d):
         d = timezone.make_aware(d, pytz.timezone('Etc/UTC'))
     return d
