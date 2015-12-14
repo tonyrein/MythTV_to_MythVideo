@@ -1,10 +1,3 @@
-# import os
-# 
-# from django.utils import timezone
-# 
-# import iso8601
-# import pytz
-
 from mythcontent.data_access import VideoApi, VideoDao, TvRecordingApi
 from mythcontent.utils import iso_to_tz_aware
 
