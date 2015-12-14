@@ -1,7 +1,6 @@
 import iso8601
 from django.utils import timezone
 import pytz
-
 import paramiko
 
 from nonpublic.settings import SSH_INFOS
@@ -10,6 +9,12 @@ from nonpublic.settings import SSH_INFOS
 Convert a string in iso8601 format representing
 a UTC date/time, or a datetime object into a
 timezone-aware datetime object.
+
+Pass:
+  * dtstr -- either a datetime object or a string
+    (in iso8601 format) representing a date and time.
+Return:
+  A timezone-aware datetime.
 """
 def iso_to_tz_aware(dtstr):
     if isinstance(dtstr, str):

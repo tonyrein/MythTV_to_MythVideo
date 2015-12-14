@@ -65,8 +65,8 @@ class VideoService(object):
     
     def in_mythvideo(self, filename):
         return VideoApi().find_in_mythvideo(filename)
-        
-    def add_video_from_tv_recording(self, recording):
+
+    def copy_tv_recording_file(self, recording):
         title_dir = recording.title.replace(' ','_') + os.sep
         relative_filespec = title_dir + recording.filename
         # Quit if it's already here...
@@ -79,7 +79,16 @@ class VideoService(object):
         api = VideoApi()
         dest_dir = api.video_directory + title_dir
         copy_file_on_remote_host(recording.hostname, recording.filespec, dest_dir)
-        # After physical file is in place, tell MythVideo about it:
+
+    
+    """
+    This assumes that the disk file is already in place in
+    the Video storage directory.
+    """     
+    def add_video_from_tv_recording(self, recording):
+        title_dir = recording.title.replace(' ','_') + os.sep
+        relative_filespec = title_dir + recording.filename
+        api = VideoApi()
         res = api.add_to_mythvideo(relative_filespec, recording.hostname)
         if res != True:
             raise Exception('Unknown failure adding {} to MythVideo'.format(recording.title))

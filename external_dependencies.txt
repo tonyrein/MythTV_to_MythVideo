@@ -3,7 +3,9 @@ MythTV_to_MythVideo requires Python 3.
 External Python modules (may be installed via pip3 or your
 distribution's package manager):
 
+django
 pytz - used for handling time zones, mostly in preparing date/time display strings
 mysqlclient (requires libmysqlclient-dev on Ubuntu/Mint/Debian)
 iso8601 - used for parsing date strings
+paramiko
 xmltodict - used for parsing data returned by MythTV api calls
