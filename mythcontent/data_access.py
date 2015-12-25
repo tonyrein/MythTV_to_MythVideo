@@ -110,7 +110,35 @@ class MythApi(object):
         for g in self.storage_groups:
             if g['GroupName'] == group_name and g['HostName'] == hostname:
                 return g['DirName']
-        return None         
+        return None    
+         
+class ChannelApi(object):
+    __instance = None # class attribute
+    __api_service_name = 'Channel'
+    def __new__(cls):
+        if ChannelApi.__instance is None:
+            ChannelApi.__instance = object.__new__(cls)
+            ChannelApi.__instance.api = MythApi()
+            ChannelApi.__instance.server_name = ChannelApi.__instance.api.server_name 
+        return ChannelApi.__instance
+    """
+    Pass: Channel id, for example '1008'
+    Returns: an ordered dict with the following keys:
+    ['@xmlns:xsi', '@version', '@serializerVersion', 'ChanId', 'ChanNum', 'CallSign',
+     'IconURL', 'ChannelName', 'MplexId', 'TransportId', 'ServiceId', 'NetworkId',
+      'ATSCMajorChan', 'ATSCMinorChan', 'Format', 'Modulation', 'Frequency', 'FrequencyId',
+       'FrequencyTable', 'FineTune', 'SIStandard', 'ChanFilters', 'SourceId', 'InputId',
+        'CommFree', 'UseEIT', 'Visible', 'XMLTVID', 'DefaultAuth', 'Programs']
+    This assumes that a valid channel id is passed. If the channel id is invalid, the
+    api call will return an exception code.
+    """
+    def get_channel_info(self,channel_id):
+        res_dict = self.api._call_myth_api(ChannelApi.__api_service_name, 'GetChannelInfo',
+                 { 'ChanID': channel_id } )
+        if 'Exception' in res_dict:
+            return None
+        else:
+            return res_dict['ChannelInfo']
 
 class VideoApi(object):
     __instance = None # class attribute
@@ -129,7 +157,7 @@ class VideoApi(object):
             hostname = self.server_name
         res_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'AddVideo',
                  { 'FileName': filename, 'HostName': hostname} )
-        return res_dict['bool'] == 'true'
+        return 'bool' in res_dict and res_dict['bool'] == 'true'
         
     def find_in_mythvideo(self, filename, hostname=None):
         if hostname is None:

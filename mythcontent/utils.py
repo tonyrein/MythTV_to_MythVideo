@@ -47,10 +47,7 @@ def time_diff_from_strings(start_time, end_time):
     start_dt = iso8601.parse_date(start_time, pytz.timezone('Etc/UTC'))
     return (int)(end_dt.timestamp() - start_dt.timestamp())
 
-"""
-Execute a 'cp -v...' command on a remote host by means of paramiko.
-"""
-def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
+def make_ssh_client(hostname):
     sshinf = SSH_INFOS[hostname]
     user = sshinf['user']
     pword = sshinf['password']
@@ -61,10 +58,94 @@ def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
         hostname, username=user,password=pword,port=port,
         allow_agent=False, look_for_keys=False
         )
+    return ssh_client
+"""
+execute a command on the specified host via ssh
+"""
+def execute_remote_command(hostname,cmd):
+    sshinf = SSH_INFOS[hostname]
+    user = sshinf['user']
+    pword = sshinf['password']
+    port = sshinf.get('port', 22)
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(
+        hostname, username=user,password=pword,port=port,
+        allow_agent=False, look_for_keys=False
+        )
+    stdin,stdout,stderr=ssh_client.exec_command(cmd)
+    return (stdin,stdout,stderr)
+
+"""
+Execute a 'cp -v...' command on a remote host by means of paramiko.
+"""
+def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
     mkdir_cmd = 'mkdir -p {}'.format(destination_dir)
     copy_cmd = 'cp -v {} {}'.format(source_filespec, destination_dir)
-    stdin,stdout,stderr=ssh_client.exec_command(mkdir_cmd)
+    stdin,stdout,stderr=execute_remote_command(hostname, mkdir_cmd)
     stdout.readlines()
-    stdin,stdout,stderr=ssh_client.exec_command(copy_cmd)
+    stdin,stdout,stderr=execute_remote_command(hostname, copy_cmd)
     stdout.readlines()
+    
+# def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
+#     sshinf = SSH_INFOS[hostname]
+#     user = sshinf['user']
+#     pword = sshinf['password']
+#     port = sshinf.get('port', 22)
+#     ssh_client = paramiko.SSHClient()
+#     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#     ssh_client.connect(
+#         hostname, username=user,password=pword,port=port,
+#         allow_agent=False, look_for_keys=False
+#         )
+#     mkdir_cmd = 'mkdir -p {}'.format(destination_dir)
+#     copy_cmd = 'cp -v {} {}'.format(source_filespec, destination_dir)
+#     stdin,stdout,stderr=ssh_client.exec_command(mkdir_cmd)
+#     stdout.readlines()
+#     stdin,stdout,stderr=ssh_client.exec_command(copy_cmd)
+#     stdout.readlines()
 
+"""
+Given a remote host and directory on that host,
+return a list. Each element of the list is
+a (file type, filename, filesize) tuple.
+    sshinf = SSH_INFOS[hostname]
+    user = sshinf['user']
+    pword = sshinf['password']
+    port = sshinf.get('port', 22)
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(
+        hostname, username=user,password=pword,port=port,
+        allow_agent=False, look_for_keys=False
+        )
+    stat_cmd='stat -c "%F*%n*%s" {}'.format(dirname)
+    stdin,stdout,stderr=ssh_client.exec_command(stat_cmd)
+    ret_list=[]
+    for line in stdout.readlines():
+        ret_list.append( ( line.strip().split('*') ) )
+    return ret_list
+
+
+Works by executing the command 'stat -c "%F*%n*%s" dirname/*'
+on the remote host.
+"""
+def list_files_on_remote_host(hostname, spec):
+    stat_cmd='stat -c "%F*%n*%s" {}'.format(spec)
+    c=make_ssh_client(hostname)
+    stdin,stdout,stderr=c.exec_command(stat_cmd)
+    ret_list=[]
+    for line in stdout.readlines():
+        ret_list.append( ( line.strip().split('*') ) )
+    return ret_list
+    
+#     
+# def list_files_on_remote_host(hostname, spec):
+#     c = make_ssh_client(hostname)
+#     stat_cmd='stat -c "%F*%n*%s" {}'.format(spec)
+#     stdin,stdout,stderr=execute_remote_command(hostname, stat_cmd)
+#     ret_list=[]
+#     for line in stdout.readlines():
+#         ret_list.append( ( line.strip().split('*') ) )
+#     return ret_list
+    

@@ -142,6 +142,11 @@ class Video(object):
     @property
     def length(self):
         return self.vid['Length']
+    @length.setter
+    def length(self,new_length):
+        if new_length < 0:
+            raise ValueError('Video length must be a number greater than zero.')
+        self.vid['Length'] = new_length
     
     @property
     def playcount(self):
@@ -166,7 +171,7 @@ class Video(object):
     def hostname(self):
         return self.vid['HostName']
     
-    def set_metadata(self, title, subtitle, year, release_date, contenttype='TELEVISION'):
+    def set_metadata(self, title, subtitle, year, release_date,length=0,contenttype='TELEVISION'):
         # following line should return a list of only 1:
         vid_list = VideoDao.objects.filter(filename=self.filename)
         if len(vid_list) != 1:
@@ -180,4 +185,5 @@ class Video(object):
         # avoid a warning when saving:
         dao.insertdate = iso_to_tz_aware(dao.insertdate)
         dao.releasedate = iso_to_tz_aware(release_date)
+        dao.length = length
         dao.save()

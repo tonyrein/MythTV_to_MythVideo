@@ -11,12 +11,12 @@ class TvRecordingService(object):
         if TvRecordingService.__instance is None:
             TvRecordingService.__instance = object.__new__(cls)
             TvRecordingService.__instance._recordings = None
+            TvRecordingService.__instance._api = TvRecordingApi()
         return TvRecordingService.__instance
     
     def load_from_mythtv(self):
-        api = TvRecordingApi()
         ret_list = []
-        for r in api.tv_recordings:
+        for r in self._api.tv_recordings:
             ret_list.append(TvRecording(r))
         return ret_list
         
@@ -26,6 +26,9 @@ class TvRecordingService(object):
             self._recordings = self.load_from_mythtv()
         return self._recordings
     
+    def contains_filename(self, fn):
+        return fn in [ r.filename for r in self.recordings ]
+     
     def erase_recording(self, recording_to_erase):
         return recording_to_erase.erase()
 
@@ -35,12 +38,15 @@ class VideoService(object):
         if VideoService.__instance is None:
             VideoService.__instance = object.__new__(cls)
             VideoService.__instance._videos = None
+            VideoService.__instance._api=VideoApi()
+            
+            
         return VideoService.__instance
     
     def load_from_mythvideo(self):
-        api = VideoApi()
+#         api = VideoApi()
         ret_list = []
-        for v in api.videos:
+        for v in self._api.videos:
             ret_list.append(Video(v))
         return ret_list
     
@@ -64,7 +70,7 @@ class VideoService(object):
             return vlist[0]  
     
     def in_mythvideo(self, filename):
-        return VideoApi().find_in_mythvideo(filename)
+        return self._api.find_in_mythvideo(filename)
 
     def copy_tv_recording_file(self, recording):
         title_dir = recording.title.replace(' ','_') + os.sep
@@ -76,8 +82,7 @@ class VideoService(object):
         if self.in_mythvideo(relative_filespec):
             raise Exception("MythVideo already contains {}".format(relative_filespec))
         # Since it's not already there, add it. First step is to copy the file:
-        api = VideoApi()
-        dest_dir = api.video_directory + title_dir
+        dest_dir = self._api.video_directory + title_dir
         copy_file_on_remote_host(recording.hostname, recording.filespec, dest_dir)
 
     
@@ -88,12 +93,11 @@ class VideoService(object):
     def add_video_from_tv_recording(self, recording):
         title_dir = recording.title.replace(' ','_') + os.sep
         relative_filespec = title_dir + recording.filename
-        api = VideoApi()
-        res = api.add_to_mythvideo(relative_filespec, recording.hostname)
+        res = self._api.add_to_mythvideo(relative_filespec, recording.hostname)
         if res != True:
             raise Exception('Unknown failure adding {} to MythVideo'.format(recording.title))
         # Now add it to this VideoService object's list:
-        res = api.find_in_mythvideo(relative_filespec)
+        res = self._api.find_in_mythvideo(relative_filespec)
         if res is None:
             raise Exception('Unknown failure adding {} to MythVideo'.format(recording.title))
         self.videos.append(Video(res))
