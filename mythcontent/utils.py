@@ -34,13 +34,42 @@ def utc_to_local(dtstr):
     return timezone.localtime(d)
 
 """
+Pass: a datetime, possibly not tz-aware
+Return: a timezone-aware datetime,
+using UTC.
+"""
+def ensure_tz_aware(dt):
+    if not timezone.is_aware(dt):
+        dt = timezone.make_aware(dt, pytz.timezone('Etc/UTC'))
+    return dt
+
+"""
+Pass: a timezone-aware datetime in
+any arbitrary timezone
+
+Return: a timezone-aware datetime using UTC
+"""
+def ensure_utc(dt):
+    if not 'UTC' in dt.tzinfo._tzname.upper():
+        dt = dt.astimezone(pytz.timezone('Etc/UTC'))
+    return dt
+
+"""
+Pass: a tz-aware datetime in utc
+Return: the equivalent local dt
+From http://stackoverflow.com/questions/4563272/how-to-convert-a-python-utc-datetime-to-a-local-datetime-using-only-python-stand/13287083#13287083
+"""
+def utc_dt_to_local_dt(utc_dt):
+    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+    
+"""
 Given two time/date strings in the format 2015-11-22 18:00:03,
 figure out the number of seconds between them.
 
 Pass:
   * Two iso-format time/date strings. We assume that both are UTC.
 Return:
-  * Difference between them, in seconds (float)
+  * Difference between them, in seconds (int)
 """
 def time_diff_from_strings(start_time, end_time):
     end_dt = iso8601.parse_date(end_time, pytz.timezone('Etc/UTC'))
@@ -59,22 +88,6 @@ def make_ssh_client(hostname):
         allow_agent=False, look_for_keys=False
         )
     return ssh_client
-"""
-execute a command on the specified host via ssh
-"""
-def execute_remote_command(hostname,cmd):
-    sshinf = SSH_INFOS[hostname]
-    user = sshinf['user']
-    pword = sshinf['password']
-    port = sshinf.get('port', 22)
-    ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh_client.connect(
-        hostname, username=user,password=pword,port=port,
-        allow_agent=False, look_for_keys=False
-        )
-    stdin,stdout,stderr=ssh_client.exec_command(cmd)
-    return (stdin,stdout,stderr)
 
 """
 Execute a 'cp -v...' command on a remote host by means of paramiko.
@@ -82,28 +95,11 @@ Execute a 'cp -v...' command on a remote host by means of paramiko.
 def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
     mkdir_cmd = 'mkdir -p {}'.format(destination_dir)
     copy_cmd = 'cp -v {} {}'.format(source_filespec, destination_dir)
-    stdin,stdout,stderr=execute_remote_command(hostname, mkdir_cmd)
+    cl=make_ssh_client(hostname)
+    stdin,stdout,stderr=cl.exec_command(mkdir_cmd)
     stdout.readlines()
-    stdin,stdout,stderr=execute_remote_command(hostname, copy_cmd)
+    stdin,stdout,stderr=cl.exec_command(copy_cmd)
     stdout.readlines()
-    
-# def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
-#     sshinf = SSH_INFOS[hostname]
-#     user = sshinf['user']
-#     pword = sshinf['password']
-#     port = sshinf.get('port', 22)
-#     ssh_client = paramiko.SSHClient()
-#     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#     ssh_client.connect(
-#         hostname, username=user,password=pword,port=port,
-#         allow_agent=False, look_for_keys=False
-#         )
-#     mkdir_cmd = 'mkdir -p {}'.format(destination_dir)
-#     copy_cmd = 'cp -v {} {}'.format(source_filespec, destination_dir)
-#     stdin,stdout,stderr=ssh_client.exec_command(mkdir_cmd)
-#     stdout.readlines()
-#     stdin,stdout,stderr=ssh_client.exec_command(copy_cmd)
-#     stdout.readlines()
 
 """
 Given a remote host and directory on that host,
@@ -132,20 +128,12 @@ on the remote host.
 """
 def list_files_on_remote_host(hostname, spec):
     stat_cmd='stat -c "%F*%n*%s" {}'.format(spec)
-    c=make_ssh_client(hostname)
-    stdin,stdout,stderr=c.exec_command(stat_cmd)
+    cl=make_ssh_client(hostname)
+    stdin,stdout,stderr=cl.exec_command(stat_cmd)
     ret_list=[]
     for line in stdout.readlines():
         ret_list.append( ( line.strip().split('*') ) )
     return ret_list
     
-#     
-# def list_files_on_remote_host(hostname, spec):
-#     c = make_ssh_client(hostname)
-#     stat_cmd='stat -c "%F*%n*%s" {}'.format(spec)
-#     stdin,stdout,stderr=execute_remote_command(hostname, stat_cmd)
-#     ret_list=[]
-#     for line in stdout.readlines():
-#         ret_list.append( ( line.strip().split('*') ) )
-#     return ret_list
+
     

@@ -1,6 +1,10 @@
-from mythcontent.data_access import VideoApi, VideoDao, TvRecordingApi
-from mythcontent.utils import iso_to_tz_aware
+import datetime
+import os
 
+from mythcontent.data_access import VideoApi, VideoDao, TvRecordingApi
+from mythcontent.utils import iso_to_tz_aware, ensure_tz_aware, ensure_utc, utc_dt_to_local_dt
+from mythcontent.constants import REC_FILENAME_DATE_FORMAT, BYTES_PER_MINUTE
+from mythcontent.data_access import ChannelApi
 """
 This class is responsible for manipulating a single
 MythTV recorded program.
@@ -61,22 +65,83 @@ class TvRecording(object):
         api = TvRecordingApi()
         return api.erase(self.prog)
         
+class ProgInfo(object):
+    def __init__(self, row = None):
+        if row is None:
+            [ self.filename, self.date, self.dow, self.time, self.channel_number,
+              self.channel_name, self.filesize, self.duration, self.title,
+              self.subtitle, self.video_made ] = [ None ]* 11
+        else:
+            [ self.filename, self.date, self.dow, self.time, self.channel_number,
+              self.channel_name, self.filesize, self.duration, self.title,
+              self.subtitle, self.video_made ] = row
+        
+    @staticmethod
+    def row_from_file_name_and_size(filename,filesize):
+        (chanid,rest) = filename.split('_')
+        channel_info = ChannelApi().get_channel_info(chanid)
+        channel_number = channel_info['ChanNum']
+        channel_name = channel_info['ChannelName']
+        dt_portion=rest[:14]
+        utc_dt=datetime.datetime.strptime(dt_portion,REC_FILENAME_DATE_FORMAT)
+        utc_dt = ensure_tz_aware(utc_dt)
+        local_dt = utc_dt_to_local_dt(utc_dt)
+        airdate=local_dt.date()
+        airtime=local_dt.time()
+        dow="{:%a}".format(airdate) # day of week as locale abbreviation
+        filesize = int(filesize)
+        duration = round(filesize/BYTES_PER_MINUTE)
+        return [ filename, airdate, dow, airtime, channel_number, channel_name,
+                filesize, duration,
+                '', # don't know title just from filename
+                '', # or subtitle
+                False]
+    
+    @staticmethod
+    def make_proginfo_from_filename_and_size(filename,filesize):
+        row = ProgInfo.row_from_file_name_and_size(filename,filesize)
+        return ProgInfo(row)
+    
+    @staticmethod
+    def make_proginfo_from_csv_row(csv_row):
+        row = ProgInfo.row_from_csv_row(csv_row)
+        return ProgInfo(row)    
+    """
+    When a csv file containing information about a recorded
+    program is read, this method converts each row from the
+    file from strings into other types, as appropriate.
+    """
+    @staticmethod
+    def row_from_csv_row(csv_row):
+        row = csv_row
+        airdate = datetime.datetime.strptime(row[1], '%Y/%m/%d')
+        row[1] = airdate
+        airtime = datetime.datetime.strptime(row[3], '%H:%M:%S').time()
+        row[3] = airtime
+        filesize = int(row[6])
+        row[6] = filesize
+        duration = int(row[7])
+        row[7] = duration
+        # Change '1' and '0' into True and False:
+        video_made = int(row[10]) != 0
+        row[10] = video_made
+        return row
+        
             
-"""
-Get a list of recorded tv programs from the API
-class and pass along that list, with each element
-wrapped in a TvRecording object.
+    def subdir(self):
+        return self.title.replace(' ','_')
+    
+    def relative_filespec(self):
+        return self.video_subdir() + os.sep + self.filename
+    
+    def full_filespec(self):
+        return VideoApi().video_directory + os.sep + self.relative_filespec()       
+            
+    def as_row(self):
+        return [ self.filename, self.date, self.dow, self.time, self.channel_number,
+             self.channel_name, self.filesize, self.duration, self.title,
+             self.subtitle, '1' if self.video_made else '0'  ]          
 
-In Java, this would probably be a static class.
-"""
-# def list_recordings():
-#     api = TvRecordingApi()
-#     return [ TvRecording(p) for p in api.tv_recordings ]             
-
-
-"""
-
-"""
 class Video(object):
     """
     Constructor takes an optional parameter which is an OrderedDict
@@ -162,15 +227,26 @@ class Video(object):
     @contenttype.setter
     def contenttype(self, new_type):
         self.vid['ContentType'] = new_type
-        
+    
+    """
+    This is really the filespec, not just
+    the name. It includes the directory portion
+    (if any) relative to the video storage
+    group directory.
+    """    
     @property
     def filename(self):
         return self.vid['FileName']
+    @filename.setter
+    def filename(self,new_name):
+        self.vid['FileName'] = new_name
+        
 
     @property
     def hostname(self):
         return self.vid['HostName']
     
+   
     def set_metadata(self, title, subtitle, year, release_date,length=0,contenttype='TELEVISION'):
         # following line should return a list of only 1:
         vid_list = VideoDao.objects.filter(filename=self.filename)

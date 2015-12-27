@@ -1,9 +1,14 @@
 import os
 import iso8601
+from collections import namedtuple
 
 from mythcontent.dto import TvRecording, Video
 from mythcontent.data_access import TvRecordingApi, VideoApi
 from mythcontent.utils import copy_file_on_remote_host
+
+prog_info=namedtuple('prog_info', [ 'filename', 'date', 'dow', 'time', 'channel_number', 'channel_name', 'filesize', 'duration', 'title', 'subtitle' ])
+
+
 
 class TvRecordingService(object):
     __instance = None # class attribute
@@ -62,7 +67,7 @@ class VideoService(object):
     """
     Given a filename, return a dto.Video object
     """
-    def video_from_filename(self,filename):
+    def get_video_from_filename(self,filename):
         vlist = [ v for v in self.videos if  v.filename == filename]
         if len(vlist) == 0:
             return None
@@ -71,6 +76,8 @@ class VideoService(object):
     
     def in_mythvideo(self, filename):
         return self._api.find_in_mythvideo(filename)
+
+
 
     def copy_tv_recording_file(self, recording):
         title_dir = recording.title.replace(' ','_') + os.sep
@@ -85,7 +92,21 @@ class VideoService(object):
         dest_dir = self._api.video_directory + title_dir
         copy_file_on_remote_host(recording.hostname, recording.filespec, dest_dir)
 
-    
+    def add_video_from_prog_info(self,pinf):
+        filespec = self.generate_video_relative_filespec(pinf)
+        if not self.in_mythvideo(filespec):
+            if not self._api.add_to_mythvideo(filespec):
+                raise Exception('Unknown failure adding to MythVideo: {}: {}-{}'.
+                                format(pinf.filename, pinf.title, pinf.subtitle)
+                                )
+            res = self._api.find_in_mythvideo(filespec)
+            if res is None:
+                raise Exception('Unknown failure adding to MythVideo: {}: {}-{}'.
+                                format(pinf.filename, pinf.title, pinf.subtitle)
+                                )
+            self.videos.append(Video(res))
+            
+                
     """
     This assumes that the disk file is already in place in
     the Video storage directory.
@@ -107,12 +128,14 @@ class VideoService(object):
         orig_aired = iso8601.parse_date(recording.airdate)
         year = orig_aired.year
         title_dir = recording.title.replace(' ', '_') + os.sep
-        v = self.video_from_filename(title_dir + recording.filename)
+        v = self.get_video_from_filename(title_dir + recording.filename)
         if v is None:
             raise Exception("Could not find video with title {} and filename {}".format(recording.title, recording.filename))
         v.set_metadata(recording.title, recording.subtitle, year, recording.airdate)
         
-
+    def video_directory(self):
+        return  self._api.video_directory
+    
     @property
     def videos(self):
         if self._videos is None:
