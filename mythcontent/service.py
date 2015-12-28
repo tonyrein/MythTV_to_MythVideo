@@ -93,7 +93,7 @@ class VideoService(object):
         copy_file_on_remote_host(recording.hostname, recording.filespec, dest_dir)
 
     def add_video_from_prog_info(self,pinf):
-        filespec = self.generate_video_relative_filespec(pinf)
+        filespec = pinf.relative_filespec()
         if not self.in_mythvideo(filespec):
             if not self._api.add_to_mythvideo(filespec):
                 raise Exception('Unknown failure adding to MythVideo: {}: {}-{}'.
@@ -132,7 +132,18 @@ class VideoService(object):
         if v is None:
             raise Exception("Could not find video with title {} and filename {}".format(recording.title, recording.filename))
         v.set_metadata(recording.title, recording.subtitle, year, recording.airdate)
-        
+    
+    
+    def update_metadat_from_proginfo(self,pinf):
+        year = str(pinf.date.year)
+        v = self.get_video_from_filename(pinf.relative_filespec())
+        if v is None:
+            raise Exception(
+                    "Could not find video with title {} and filename {}"
+                    .format(pinf.title, pinf.filename)
+                    )
+        v.set_metadata(pinf.title, pinf.subtitle, pinf.year, pinf.date)
+            
     def video_directory(self):
         return  self._api.video_directory
     
