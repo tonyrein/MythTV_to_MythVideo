@@ -81,7 +81,21 @@ class ProgInfo(object):
         return [ 'filename','date','dow','time','channel_number','channel_name',
                 'filesize','duration','title','subtitle','video_made'
                 ]
-        
+    
+    """
+    Parses file name and file size to fill in some basic
+    information about the program.
+    The file name is of the form: 
+      CCCC_YYYYMMDDHHMMSS.mpg, where CCCC=channel id, YYYY is year,
+      MM is month, DD day of month, HH hours, MM minutes, and SS seconds.
+    From the channel id we can make a MythTV API call to get the channel name
+    and channel number, and then use strptime to get a datetime from the rest.
+    
+    From the datetime we can derive the date, the time, and the day of week.
+    
+    Then, from the file size, we guess the duration.
+      
+    """    
     @staticmethod
     def row_from_file_name_and_size(filename,filesize):
         (chanid,rest) = filename.split('_')
@@ -120,7 +134,7 @@ class ProgInfo(object):
     @staticmethod
     def row_from_csv_row(csv_row):
         row = csv_row
-        airdate = datetime.datetime.strptime(row[1], '%Y/%m/%d')
+        airdate = datetime.datetime.strptime(row[1][:10], '%Y/%m/%d')
         row[1] = airdate
         airtime = datetime.datetime.strptime(row[3], '%H:%M:%S').time()
         row[3] = airtime
@@ -209,6 +223,16 @@ class Video(object):
     @property
     def adddate(self):
         return self.vid['AddDate']
+    @adddate.setter
+    def adddate(self,new_date):
+        self.vid['AddDate'] = new_date
+    
+    @property
+    def releasedate(self):
+        return self.vid['ReleaseDate']
+    @releasedate.setter
+    def releasedate(self,new_date):
+        self.vid['ReleaseDate'] = new_date
     
     @property
     def length(self):
@@ -279,4 +303,8 @@ class Video(object):
         # set our own metadata also, as well as that in the database:
         self.title = title
         self.subtitle = subtitle
+        self.year = year
+        self.releasedate = dao.releasedate
+        self.adddate = dao.insertdate
+        
         
