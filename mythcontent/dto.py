@@ -75,6 +75,12 @@ class ProgInfo(object):
             [ self.filename, self.date, self.dow, self.time, self.channel_number,
               self.channel_name, self.filesize, self.duration, self.title,
               self.subtitle, self.video_made ] = row
+    
+    @staticmethod
+    def fieldnames():
+        return [ 'filename','date','dow','time','channel_number','channel_name',
+                'filesize','duration','title','subtitle','video_made'
+                ]
         
     @staticmethod
     def row_from_file_name_and_size(filename,filesize):
@@ -132,10 +138,10 @@ class ProgInfo(object):
         return self.title.replace(' ','_')
     
     def relative_filespec(self):
-        return self.video_subdir() + os.sep + self.filename
+        return self.subdir() + os.sep + self.filename
     
     def full_filespec(self):
-        return VideoApi().video_directory + os.sep + self.relative_filespec()       
+        return VideoApi().video_directory + self.relative_filespec()       
             
     def as_row(self):
         return [ self.filename, self.date, self.dow, self.time, self.channel_number,
@@ -214,6 +220,13 @@ class Video(object):
         self.vid['Length'] = new_length
     
     @property
+    def year(self):
+        return self.vid['Year']
+    @year.setter
+    def year(self, new_year):
+        self.vid['Year'] = new_year
+    
+    @property
     def playcount(self):
         return self.vid['PlayCount']
     
@@ -263,3 +276,7 @@ class Video(object):
         dao.releasedate = iso_to_tz_aware(release_date)
         dao.length = length
         dao.save()
+        # set our own metadata also, as well as that in the database:
+        self.title = title
+        self.subtitle = subtitle
+        

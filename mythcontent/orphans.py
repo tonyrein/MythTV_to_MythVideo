@@ -41,7 +41,7 @@ from mythcontent.data_access import ChannelApi
 from mythcontent.dto import ProgInfo
 from mythcontent.utils import list_files_on_remote_host
 from mythcontent.utils import copy_file_on_remote_host
-from mythcontent.service import TvRecordingService, VideoService, prog_info
+from mythcontent.service import TvRecordingService, VideoService
 from nonpublic.settings import ORPHANS
 # Use prog_info for stuff that's to be displayed and manually edited. That is,
 # This is used to generate and then read a CSV file that will be shown to the
@@ -164,7 +164,7 @@ class Rescuer(object):
         with open(self.metadata_file,'w') as outfile:
             writer=csv.writer(outfile)
             # write headers:
-            writer.writerow(prog_info._fields)
+            writer.writerow(ProgInfo.fieldnames())
             for f in self.file_list:
                 writer.writerow(f.as_row())
 #                 writer.writerow( list(f._asdict().values()   ))
@@ -176,15 +176,7 @@ class Rescuer(object):
                     False
                     )
 
-#     def generate_video_subdir(self,pinf):
-#         return pinf.title.replace(' ','_')
-#     
-#     def generate_video_relative_filespec(self,pinf):
-#         return self.generate_video_subdir(pinf) + os.sep + pinf.filename
-#     
-#     def generate_video_full_filespec(self,pinf):
-#         return self.video_dir + os.sep + self.generate_video_relative_filespec(pinf)
-                   
+
     """
     Copy a recording's file from the tv recordings directory to the
     video directory. This assumes that the two are either on the

@@ -1,12 +1,13 @@
 import os
 import iso8601
-from collections import namedtuple
+# from collections import namedtuple
 
 from mythcontent.dto import TvRecording, Video
 from mythcontent.data_access import TvRecordingApi, VideoApi
-from mythcontent.utils import copy_file_on_remote_host
+from mythcontent.utils import copy_file_on_remote_host, size_remote_file
+from nonpublic.settings import ORPHANS
 
-prog_info=namedtuple('prog_info', [ 'filename', 'date', 'dow', 'time', 'channel_number', 'channel_name', 'filesize', 'duration', 'title', 'subtitle' ])
+# prog_info=namedtuple('prog_info', [ 'filename', 'date', 'dow', 'time', 'channel_number', 'channel_name', 'filesize', 'duration', 'title', 'subtitle' ])
 
 
 
@@ -92,6 +93,24 @@ class VideoService(object):
         dest_dir = self._api.video_directory + title_dir
         copy_file_on_remote_host(recording.hostname, recording.filespec, dest_dir)
 
+
+    def copy_file_from_tv_to_video(self, pinf, source_dir):
+        relative_filespec = pinf.relative_filespec()
+        if relative_filespec in self:
+            raise Exception("VideoService already contains {}".format(relative_filespec))
+        if self.in_mythvideo(relative_filespec):
+            raise Exception("MythVideo already contains {}".format(relative_filespec))
+        # Since it's not already there, do the copy:
+        dest_dir = self.video_directory() + pinf.subdir() + os.sep
+        source_filespec = source_dir + os.sep + pinf.filename
+        hostname = ORPHANS['mythhost']
+        copy_file_on_remote_host(hostname, source_filespec, dest_dir)
+        # Now compare source and dest file sizes to see if copy was successful:
+        size_source = size_remote_file(hostname, source_filespec)
+        size_dest = size_remote_file(hostname, pinf.full_filespec())
+        return size_source - size_dest
+        
+        
     def add_video_from_prog_info(self,pinf):
         filespec = pinf.relative_filespec()
         if not self.in_mythvideo(filespec):
@@ -134,7 +153,7 @@ class VideoService(object):
         v.set_metadata(recording.title, recording.subtitle, year, recording.airdate)
     
     
-    def update_metadat_from_proginfo(self,pinf):
+    def update_metadata_from_proginfo(self,pinf):
         year = str(pinf.date.year)
         v = self.get_video_from_filename(pinf.relative_filespec())
         if v is None:
@@ -142,7 +161,7 @@ class VideoService(object):
                     "Could not find video with title {} and filename {}"
                     .format(pinf.title, pinf.filename)
                     )
-        v.set_metadata(pinf.title, pinf.subtitle, pinf.year, pinf.date)
+        v.set_metadata(pinf.title, pinf.subtitle, year, pinf.date, pinf.duration)
             
     def video_directory(self):
         return  self._api.video_directory
