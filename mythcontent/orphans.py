@@ -91,7 +91,8 @@ class Rescuer(object):
         self.hostname = hostname
         self.recording_dir = recording_dir
         self.metadata_file = metadata_file
-        self.video_dir = VideoService().video_directory()
+        vs = VideoService()
+        self.video_dir = vs.video_directory()
         
         # If metadata_file already exists, read it. If not,
         # assume this is the first run and create it.

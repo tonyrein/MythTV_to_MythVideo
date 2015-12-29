@@ -45,8 +45,6 @@ class VideoService(object):
             VideoService.__instance = object.__new__(cls)
             VideoService.__instance._videos = None
             VideoService.__instance._api=VideoApi()
-            
-            
         return VideoService.__instance
     
     def load_from_mythvideo(self):
