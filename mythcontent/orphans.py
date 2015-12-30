@@ -39,7 +39,7 @@ import csv
 import os.path
 # from mythcontent.data_access import ChannelApi
 from mythcontent.dto import ProgInfo
-from mythcontent.utils import list_files_on_remote_host, copy_file_on_remote_host
+from mythcontent.utils import list_files_on_remote_host
 from mythcontent.service import TvRecordingService, VideoService
 from nonpublic.settings import ORPHANS
 
@@ -138,6 +138,15 @@ class Rescuer(object):
         # If all the above was successful, mark this ProgInfo as done:
         pinf.video_made = True
         
+    def delete_prog(self,pinf):
+        vs = VideoService()
+        (exit_status,stdout,stderr) = vs.delete_video_from_proginfo(
+                            self.hostname, pinf, force_delete = False
+                            )
+        if exit_status == 0:
+            self.file_list.remove(pinf)
+
+
         
         
     

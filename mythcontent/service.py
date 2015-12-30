@@ -4,7 +4,7 @@ import iso8601
 
 from mythcontent.dto import TvRecording, Video
 from mythcontent.data_access import TvRecordingApi, VideoApi
-from mythcontent.utils import copy_file_on_remote_host, size_remote_file
+from mythcontent.utils import copy_file_on_remote_host, size_remote_file, delete_remote_file
 from nonpublic.settings import ORPHANS
 
 # prog_info=namedtuple('prog_info', [ 'filename', 'date', 'dow', 'time', 'channel_number', 'channel_name', 'filesize', 'duration', 'title', 'subtitle' ])
@@ -160,7 +160,13 @@ class VideoService(object):
                     .format(pinf.title, pinf.filename)
                     )
         v.set_metadata(pinf.title, pinf.subtitle, year, pinf.date, pinf.duration)
-            
+        
+    def delete_video_from_proginfo(self,hostname,pinf,force_delete=False):
+        if not pinf.video_made:
+            if not force_delete:
+                return
+        return delete_remote_file(hostname, pinf.full_filespec())       
+        
     def video_directory(self):
         return  self._api.video_directory
     

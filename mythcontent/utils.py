@@ -99,12 +99,8 @@ def copy_file_on_remote_host(hostname, source_filespec, destination_dir):
     stdin,stdout,stderr=cl.exec_command(mkdir_cmd)
     for l in stderr.readlines():
         print(l)
-    for l in stdout.readlines():
-        print(l)
     stdin,stdout,stderr=cl.exec_command(copy_cmd)
     for l in stderr.readlines():
-        print(l)
-    for l in stdout.readlines():
         print(l)
 
 """
@@ -200,3 +196,10 @@ def size_remote_file(hostname, filespec):
     if not 'size' in res_list[0]:
         raise Exception("Could not determine size of {} on host {}".format(filespec,hostname))
     return int(res_list[0]['size'])
+
+def delete_remote_file(hostname, filespec):
+    rm_cmd = "rm -f {}".format(filespec)
+    cl=make_ssh_client(hostname)
+    stdin,stdout,stderr=cl.exec_command(rm_cmd)
+    return (stdout.channel.recv_exit_status(), stdout, stderr)
+    

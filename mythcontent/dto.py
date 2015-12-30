@@ -66,7 +66,7 @@ class TvRecording(object):
         return api.erase(self.prog)
         
 class ProgInfo(object):
-    def __init__(self, row = None):
+    def __init__(self, row=None, tv_dir=None):
         if row is None:
             [ self.filename, self.date, self.dow, self.time, self.channel_number,
               self.channel_name, self.filesize, self.duration, self.title,
@@ -75,6 +75,7 @@ class ProgInfo(object):
             [ self.filename, self.date, self.dow, self.time, self.channel_number,
               self.channel_name, self.filesize, self.duration, self.title,
               self.subtitle, self.video_made ] = row
+        self.tv_dir = tv_dir
     
     @staticmethod
     def fieldnames():
@@ -118,14 +119,14 @@ class ProgInfo(object):
                 False]
     
     @staticmethod
-    def make_proginfo_from_filename_and_size(filename,filesize):
-        row = ProgInfo.row_from_file_name_and_size(filename,filesize)
-        return ProgInfo(row)
+    def make_proginfo_from_filename_and_size(filename,filesize,tv_dir=None):
+        r = ProgInfo.row_from_file_name_and_size(filename,filesize)
+        return ProgInfo(row=r,tv_dir)
     
     @staticmethod
-    def make_proginfo_from_csv_row(csv_row):
-        row = ProgInfo.row_from_csv_row(csv_row)
-        return ProgInfo(row)    
+    def make_proginfo_from_csv_row(csv_row,tv_dir=None):
+        r = ProgInfo.row_from_csv_row(csv_row)
+        return ProgInfo(row=r)    
     """
     When a csv file containing information about a recorded
     program is read, this method converts each row from the
@@ -134,7 +135,8 @@ class ProgInfo(object):
     @staticmethod
     def row_from_csv_row(csv_row):
         row = csv_row
-        airdate = datetime.datetime.strptime(row[1][:10], '%Y/%m/%d')
+        s = row[1][:10].replace('-','/')
+        airdate = datetime.datetime.strptime(s, '%Y/%m/%d')
         row[1] = airdate
         airtime = datetime.datetime.strptime(row[3], '%H:%M:%S').time()
         row[3] = airtime
@@ -148,15 +150,17 @@ class ProgInfo(object):
         return row
         
             
-    def subdir(self):
+    def video_subdir(self):
         return self.title.replace(' ','_')
     
-    def relative_filespec(self):
+    def video_relative_filespec(self):
         return self.subdir() + os.sep + self.filename
     
-    def full_filespec(self):
+    def video_full_filespec(self):
         return VideoApi().video_directory + self.relative_filespec()       
-            
+    
+    def tv_full_filespec(self):
+        
     def as_row(self):
         return [ self.filename, self.date, self.dow, self.time, self.channel_number,
              self.channel_name, self.filesize, self.duration, self.title,
