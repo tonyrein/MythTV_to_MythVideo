@@ -22,7 +22,7 @@
       </ownedOperation>
     </packagedElement>
   </packagedElement>
-  <packagedElement xmi:type="uml:Package" xmi:id="_XUW0cJE9EeWIpOPBohsQPw" name="Data Transport">
+  <packagedElement xmi:type="uml:Package" xmi:id="_XUW0cJE9EeWIpOPBohsQPw" name="Old Data Transport">
     <packagedElement xmi:type="uml:Class" xmi:id="_VoH-UJFMEeWIpOPBohsQPw" name="TvRecording">
       <ownedOperation xmi:id="_HegwkJFSEeWIpOPBohsQPw" name="delete"/>
     </packagedElement>
@@ -44,5 +44,8 @@
   <packagedElement xmi:type="uml:Package" xmi:id="_bKWpEJFSEeWIpOPBohsQPw" name="Presentation">
     <packagedElement xmi:type="uml:Package" xmi:id="_4O-bYJE9EeWIpOPBohsQPw" name="Templates"/>
     <packagedElement xmi:type="uml:Package" xmi:id="_1Y1UsJE9EeWIpOPBohsQPw" name="Urls"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_VK29AK9oEeW5R5goK4J0qg" name="DTO">
+    <packagedElement xmi:type="uml:Class" xmi:id="_DFHDIK9pEeW5R5goK4J0qg" name="Class1"/>
   </packagedElement>
 </uml:Model>

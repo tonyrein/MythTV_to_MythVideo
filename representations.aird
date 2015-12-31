@@ -104,7 +104,7 @@
               <styles xmi:type="notation:FilteringStyle" xmi:id="_XVLT0pE9EeWIpOPBohsQPw"/>
             </children>
             <styles xmi:type="notation:ShapeStyle" xmi:id="_XVKFsZE9EeWIpOPBohsQPw" fontName="Oxygen-Sans Sans-Book" bold="true"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XVKFspE9EeWIpOPBohsQPw" x="792" y="396" width="615" height="207"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XVKFspE9EeWIpOPBohsQPw" x="792" y="396" width="411" height="171"/>
           </children>
           <children xmi:type="notation:Node" xmi:id="_e6dDIJE9EeWIpOPBohsQPw" type="2002" element="_e5sOIJE9EeWIpOPBohsQPw">
             <children xmi:type="notation:Node" xmi:id="_e6eRQJE9EeWIpOPBohsQPw" type="5006"/>
@@ -219,6 +219,36 @@
             </children>
             <styles xmi:type="notation:ShapeStyle" xmi:id="_bMMcIZFSEeWIpOPBohsQPw" fontName="Oxygen-Sans Sans-Book" bold="true"/>
             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bMMcIpFSEeWIpOPBohsQPw" x="612" y="6" width="291" height="111"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_VPNRgK9oEeW5R5goK4J0qg" type="2002" element="_VK8ckK9oEeW5R5goK4J0qg">
+            <children xmi:type="notation:Node" xmi:id="_VPSKAK9oEeW5R5goK4J0qg" type="5006"/>
+            <children xmi:type="notation:Node" xmi:id="_VPSxEK9oEeW5R5goK4J0qg" type="7001">
+              <children xmi:type="notation:Shape" xmi:id="_uD4FAK9oEeW5R5goK4J0qg" type="Note" fontName="Oxygen-Sans Sans-Book" description="DTO has classes that handle data in RAM and in transit. It does not concern itself with the storage of the data - for that it uses objects in the SERVICE package." fillColor="13369343" transparency="0" lineColor="6737151" lineWidth="1">
+                <children xmi:type="notation:BasicDecorationNode" xmi:id="_uD4FAa9oEeW5R5goK4J0qg" type="DiagramName">
+                  <element xsi:nil="true"/>
+                </children>
+                <children xmi:type="notation:BasicDecorationNode" xmi:id="_uD4FAq9oEeW5R5goK4J0qg" type="Description">
+                  <element xsi:nil="true"/>
+                </children>
+                <styles xmi:type="notation:TextStyle" xmi:id="_uD4FA69oEeW5R5goK4J0qg"/>
+                <styles xmi:type="notation:LineTypeStyle" xmi:id="_uD4FBK9oEeW5R5goK4J0qg"/>
+                <element xsi:nil="true"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uD4FBa9oEeW5R5goK4J0qg" x="579" y="6" width="128" height="85"/>
+              </children>
+              <children xmi:type="notation:Node" xmi:id="_DJKcsK9pEeW5R5goK4J0qg" type="3009" element="_DFHqMK9pEeW5R5goK4J0qg">
+                <children xmi:type="notation:Node" xmi:id="_DJLDwK9pEeW5R5goK4J0qg" type="5004"/>
+                <children xmi:type="notation:Node" xmi:id="_DJLq0K9pEeW5R5goK4J0qg" type="7003">
+                  <styles xmi:type="notation:SortingStyle" xmi:id="_DJLq0a9pEeW5R5goK4J0qg"/>
+                  <styles xmi:type="notation:FilteringStyle" xmi:id="_DJLq0q9pEeW5R5goK4J0qg"/>
+                </children>
+                <styles xmi:type="notation:ShapeStyle" xmi:id="_DJKcsa9pEeW5R5goK4J0qg" fontName="Sans" bold="true"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DJKcsq9pEeW5R5goK4J0qg" x="133" y="71" width="120" height="100"/>
+              </children>
+              <styles xmi:type="notation:SortingStyle" xmi:id="_VPSxEa9oEeW5R5goK4J0qg"/>
+              <styles xmi:type="notation:FilteringStyle" xmi:id="_VPSxEq9oEeW5R5goK4J0qg"/>
+            </children>
+            <styles xmi:type="notation:ShapeStyle" xmi:id="_VPNRga9oEeW5R5goK4J0qg" fontName="Sans" bold="true"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_VPNRgq9oEeW5R5goK4J0qg" x="252" y="108" width="699" height="531"/>
           </children>
           <styles xmi:type="notation:DiagramStyle" xmi:id="_7sqfspE8EeWIpOPBohsQPw"/>
         </data>
@@ -360,7 +390,7 @@
           </ownedElements>
         </ownedDiagramElements>
       </ownedDiagramElements>
-      <ownedDiagramElements xmi:type="diagram:DNodeContainer" xmi:id="_XUYCkJE9EeWIpOPBohsQPw" name="Data Transport" width="12" height="10">
+      <ownedDiagramElements xmi:type="diagram:DNodeContainer" xmi:id="_XUYCkJE9EeWIpOPBohsQPw" name="Old Data Transport" width="12" height="10">
         <target xmi:type="uml:Package" href="mythtv_to_mythvideo.uml#_XUW0cJE9EeWIpOPBohsQPw"/>
         <semanticElements xmi:type="uml:Package" href="mythtv_to_mythvideo.uml#_XUW0cJE9EeWIpOPBohsQPw"/>
         <arrangeConstraints>KEEP_LOCATION</arrangeConstraints>
@@ -576,6 +606,33 @@
             <foregroundColor xmi:type="viewpoint:RGBValues" xmi:id="_so_DIJFSEeWIpOPBohsQPw" red="220" green="233" blue="229"/>
           </ownedStyle>
           <actualMapping xmi:type="description_1:ContainerMapping" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Class%20Diagram']/@defaultLayer/@containerMappings[name='CD_Package']"/>
+        </ownedDiagramElements>
+      </ownedDiagramElements>
+      <ownedDiagramElements xmi:type="diagram:DNodeContainer" xmi:id="_VK8ckK9oEeW5R5goK4J0qg" name="DTO" width="12" height="10">
+        <target xmi:type="uml:Package" href="mythtv_to_mythvideo.uml#_VK29AK9oEeW5R5goK4J0qg"/>
+        <semanticElements xmi:type="uml:Package" href="mythtv_to_mythvideo.uml#_VK29AK9oEeW5R5goK4J0qg"/>
+        <arrangeConstraints>KEEP_LOCATION</arrangeConstraints>
+        <arrangeConstraints>KEEP_SIZE</arrangeConstraints>
+        <arrangeConstraints>KEEP_RATIO</arrangeConstraints>
+        <ownedStyle xmi:type="diagram:FlatContainerStyle" xmi:id="_VLRzwK9oEeW5R5goK4J0qg" labelSize="9" labelFormat="bold" labelAlignment="LEFT" backgroundStyle="GradientTopToBottom">
+          <labelColor xmi:type="viewpoint:RGBValues" xmi:id="_VLRzwa9oEeW5R5goK4J0qg"/>
+          <description xmi:type="style:FlatContainerStyleDescription" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Class%20Diagram']/@defaultLayer/@containerMappings[name='CD_Package']/@style"/>
+          <borderColor xmi:type="viewpoint:RGBValues" xmi:id="_VLRzwq9oEeW5R5goK4J0qg" red="39" green="76" blue="114"/>
+          <backgroundColor xmi:type="viewpoint:RGBValues" xmi:id="_VLRzw69oEeW5R5goK4J0qg" red="255" green="255" blue="255"/>
+          <foregroundColor xmi:type="viewpoint:RGBValues" xmi:id="_VLkHoK9oEeW5R5goK4J0qg" red="229" green="241" blue="236"/>
+        </ownedStyle>
+        <actualMapping xmi:type="description_1:ContainerMapping" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Class%20Diagram']/@defaultLayer/@containerMappings[name='CD_Package']"/>
+        <ownedDiagramElements xmi:type="diagram:DNodeList" xmi:id="_DFHqMK9pEeW5R5goK4J0qg" name="Class1" width="12" height="10">
+          <target xmi:type="uml:Class" href="mythtv_to_mythvideo.uml#_DFHDIK9pEeW5R5goK4J0qg"/>
+          <semanticElements xmi:type="uml:Class" href="mythtv_to_mythvideo.uml#_DFHDIK9pEeW5R5goK4J0qg"/>
+          <ownedStyle xmi:type="diagram:FlatContainerStyle" xmi:id="_DFbMMK9pEeW5R5goK4J0qg" labelSize="9" labelFormat="bold" backgroundStyle="Liquid">
+            <labelColor xmi:type="viewpoint:RGBValues" xmi:id="_DFbMMa9pEeW5R5goK4J0qg"/>
+            <description xmi:type="style:FlatContainerStyleDescription" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Class%20Diagram']/@defaultLayer/@containerMappings[name='CD_Class']/@style"/>
+            <borderColor xmi:type="viewpoint:RGBValues" xmi:id="_DFbMMq9pEeW5R5goK4J0qg" red="39" green="76" blue="114"/>
+            <backgroundColor xmi:type="viewpoint:RGBValues" xmi:id="_DFbMM69pEeW5R5goK4J0qg" red="255" green="255" blue="255"/>
+            <foregroundColor xmi:type="viewpoint:RGBValues" xmi:id="_DFbMNK9pEeW5R5goK4J0qg" red="232" green="239" blue="247"/>
+          </ownedStyle>
+          <actualMapping xmi:type="description_1:ContainerMapping" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Class%20Diagram']/@defaultLayer/@containerMappings[name='CD_Class']"/>
         </ownedDiagramElements>
       </ownedDiagramElements>
       <description xmi:type="description_1:DiagramDescription" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Class%20Diagram']"/>

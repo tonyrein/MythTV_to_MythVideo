@@ -160,6 +160,7 @@ class ProgInfo(object):
         return VideoApi().video_directory + self.relative_filespec()       
     
     def tv_full_filespec(self):
+            pass
         
     def as_row(self):
         return [ self.filename, self.date, self.dow, self.time, self.channel_number,
