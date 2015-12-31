@@ -622,7 +622,7 @@
           <foregroundColor xmi:type="viewpoint:RGBValues" xmi:id="_VLkHoK9oEeW5R5goK4J0qg" red="229" green="241" blue="236"/>
         </ownedStyle>
         <actualMapping xmi:type="description_1:ContainerMapping" href="platform:/plugin/org.obeonetwork.dsl.uml2.design/description/uml2.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Class%20Diagram']/@defaultLayer/@containerMappings[name='CD_Package']"/>
-        <ownedDiagramElements xmi:type="diagram:DNodeList" xmi:id="_DFHqMK9pEeW5R5goK4J0qg" name="Class1" width="12" height="10">
+        <ownedDiagramElements xmi:type="diagram:DNodeList" xmi:id="_DFHqMK9pEeW5R5goK4J0qg" name="ProgInfo" width="12" height="10">
           <target xmi:type="uml:Class" href="mythtv_to_mythvideo.uml#_DFHDIK9pEeW5R5goK4J0qg"/>
           <semanticElements xmi:type="uml:Class" href="mythtv_to_mythvideo.uml#_DFHDIK9pEeW5R5goK4J0qg"/>
           <ownedStyle xmi:type="diagram:FlatContainerStyle" xmi:id="_DFbMMK9pEeW5R5goK4J0qg" labelSize="9" labelFormat="bold" backgroundStyle="Liquid">

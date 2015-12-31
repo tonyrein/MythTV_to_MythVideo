@@ -1,3 +1,4 @@
+DTO
 Package DTO has classes that handle data in RAM and in transit. It does not concern itself with the storage of the data - for that it uses objects in the SERVICE package.
 
 Class ProgInfo
@@ -8,4 +9,6 @@ If the file is an "orphan," the title and subtitle will be supplied by a human; 
 
 ProgInfo is the parent class for VidInfo, TvInfo, and OrphanInfo. The child classes will have additional data attributes specific to their functions.
 
-
+SERVICE
+Package SERVICE handles reading and writing lists of ProgInfo objects, and transforming ProgInfo objects from one type to another (for example, transforming a tv recording into a video).
+ 

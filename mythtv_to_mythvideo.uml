@@ -46,6 +46,6 @@
     <packagedElement xmi:type="uml:Package" xmi:id="_1Y1UsJE9EeWIpOPBohsQPw" name="Urls"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_VK29AK9oEeW5R5goK4J0qg" name="DTO">
-    <packagedElement xmi:type="uml:Class" xmi:id="_DFHDIK9pEeW5R5goK4J0qg" name="Class1"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_DFHDIK9pEeW5R5goK4J0qg" name="ProgInfo"/>
   </packagedElement>
 </uml:Model>
