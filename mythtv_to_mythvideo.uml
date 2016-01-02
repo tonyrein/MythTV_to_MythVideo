@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_LzmdIJE0EeWsQNn59hdsiA" name="Layers">
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_LzmdIJE0EeWsQNn59hdsiA" name="Layers">
   <packagedElement xmi:type="uml:Package" xmi:id="_Oo78cJE9EeWIpOPBohsQPw" name="Service">
     <packagedElement xmi:type="uml:Class" xmi:id="_z980oJFJEeWIpOPBohsQPw" name="VidService">
       <ownedAttribute xmi:id="_UtFAcJFOEeWIpOPBohsQPw" name="list_of_vids"/>
@@ -46,6 +46,83 @@
     <packagedElement xmi:type="uml:Package" xmi:id="_1Y1UsJE9EeWIpOPBohsQPw" name="Urls"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_VK29AK9oEeW5R5goK4J0qg" name="DTO">
-    <packagedElement xmi:type="uml:Class" xmi:id="_DFHDIK9pEeW5R5goK4J0qg" name="ProgInfo"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_DFHDIK9pEeW5R5goK4J0qg" name="ProgInfo">
+      <ownedAttribute xmi:id="_qJdDIK_yEeWAvPs-aA__Zw" name="filename">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_qJdDIa_yEeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_qJdqMK_yEeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_2YVa0K_yEeWAvPs-aA__Zw" name="directory">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_2YWB4K_yEeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_2YWB4a_yEeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_7IiacK_yEeWAvPs-aA__Zw" name="hostname">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_7IjBgK_yEeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_7IjBga_yEeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_Bf0FkK_zEeWAvPs-aA__Zw" name="filesize">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_Bf0soK_zEeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_Bf0soa_zEeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_JMh5oK_zEeWAvPs-aA__Zw" name="title">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_JMigsK_zEeWAvPs-aA__Zw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JMigsa_zEeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_Md3HgK_zEeWAvPs-aA__Zw" name="subtitle">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_Md3Hga_zEeWAvPs-aA__Zw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_Md3Hgq_zEeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_9cpScK_vEeWAvPs-aA__Zw" name="OrphanDto">
+      <ownedAttribute xmi:id="_bf2DgK_0EeWAvPs-aA__Zw" name="channel">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_bf2qkK_0EeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_bf2qka_0EeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_lIPhIK_0EeWAvPs-aA__Zw" name="start_time">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/XMLPrimitiveTypes.library.uml#DateTime"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_lIQIMK_0EeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_lIQIMa_0EeWAvPs-aA__Zw" value="1"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_B0HpAK_wEeWAvPs-aA__Zw" name="VideoDto"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_D1m_oK_wEeWAvPs-aA__Zw" name="TvRecordingDto"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_kmlF4K_xEeWAvPs-aA__Zw" memberEnd="_kmlF4a_xEeWAvPs-aA__Zw _kmmUAq_xEeWAvPs-aA__Zw" navigableOwnedEnd="_kmmUAq_xEeWAvPs-aA__Zw">
+      <name xsi:nil="true"/>
+      <ownedEnd xmi:id="_kmlF4a_xEeWAvPs-aA__Zw" name="orphanDtos" type="_9cpScK_vEeWAvPs-aA__Zw" aggregation="composite" association="_kmlF4K_xEeWAvPs-aA__Zw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_kmmUAK_xEeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_kmmUAa_xEeWAvPs-aA__Zw" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_kmmUAq_xEeWAvPs-aA__Zw" name="progInfos" type="_DFHDIK9pEeW5R5goK4J0qg" aggregation="composite" association="_kmlF4K_xEeWAvPs-aA__Zw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_kmm7EK_xEeWAvPs-aA__Zw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_kmniIK_xEeWAvPs-aA__Zw" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_8oFXEK_xEeWAvPs-aA__Zw" memberEnd="_8oF-IK_xEeWAvPs-aA__Zw _8oGlMq_xEeWAvPs-aA__Zw" navigableOwnedEnd="_8oGlMq_xEeWAvPs-aA__Zw">
+      <name xsi:nil="true"/>
+      <ownedEnd xmi:id="_8oF-IK_xEeWAvPs-aA__Zw" name="videoDtos" type="_B0HpAK_wEeWAvPs-aA__Zw" aggregation="composite" association="_8oFXEK_xEeWAvPs-aA__Zw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_8oGlMK_xEeWAvPs-aA__Zw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_8oGlMa_xEeWAvPs-aA__Zw" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_8oGlMq_xEeWAvPs-aA__Zw" name="progInfos" type="_DFHDIK9pEeW5R5goK4J0qg" aggregation="composite" association="_8oFXEK_xEeWAvPs-aA__Zw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_8oHMQK_xEeWAvPs-aA__Zw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_8oHMQa_xEeWAvPs-aA__Zw" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_LdEOUK_yEeWAvPs-aA__Zw" name="A_tvRecordingDtos_progInfos" memberEnd="_LdE1YK_yEeWAvPs-aA__Zw _LdFccq_yEeWAvPs-aA__Zw" navigableOwnedEnd="_LdFccq_yEeWAvPs-aA__Zw">
+      <ownedEnd xmi:id="_LdE1YK_yEeWAvPs-aA__Zw" name="tvRecordingDtos" type="_D1m_oK_wEeWAvPs-aA__Zw" aggregation="composite" association="_LdEOUK_yEeWAvPs-aA__Zw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_LdFccK_yEeWAvPs-aA__Zw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_LdFcca_yEeWAvPs-aA__Zw" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_LdFccq_yEeWAvPs-aA__Zw" name="progInfos" type="_DFHDIK9pEeW5R5goK4J0qg" aggregation="composite" association="_LdEOUK_yEeWAvPs-aA__Zw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_LdGDgK_yEeWAvPs-aA__Zw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_LdGqkK_yEeWAvPs-aA__Zw" value="1"/>
+      </ownedEnd>
+    </packagedElement>
   </packagedElement>
 </uml:Model>

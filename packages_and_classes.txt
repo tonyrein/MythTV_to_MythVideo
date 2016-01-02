@@ -2,13 +2,19 @@ DTO
 Package DTO has classes that handle data in RAM and in transit. It does not concern itself with the storage of the data - for that it uses objects in the SERVICE package.
 
 Class ProgInfo
-This class has information about a program. A "program" is an MPG file, which MythTV can provide to viewers either by the Watch Recordings or the Watch Videos interface. No matter whether the file represents a tv program, a video, or neither (ie, the file is an "orphan"), it will have associated with it the following:
+This class has information about a program. A "program" is an MPG file, which MythTV can provide to viewers either by the Watch Recordings or the Watch Videos interface. No matter whether the file represents a TV program, a video, or neither (ie, the file is an "orphan"), it will have associated with it the following:
 filename, filesize, title, subtitle, host, directory
 
 If the file is an "orphan," the title and subtitle will be supplied by a human; otherwise, they will already be available in MythTV's "mythconverg" database. (Accessing the database will be the responsibility of the lower-level classes used by the high-level classes in SERVICE.)
 
-ProgInfo is the parent class for VidInfo, TvInfo, and OrphanInfo. The child classes will have additional data attributes specific to their functions.
+Also in this package are the classes Video, TvRecording, and Orphan. Each of these contains ("has-a") a ProgInfo instance and of course has additional data attributes specific to its functions.
 
 SERVICE
-Package SERVICE handles reading and writing lists of ProgInfo objects, and transforming ProgInfo objects from one type to another (for example, transforming a tv recording into a video).
+Package SERVICE handles reading and writing lists of ProgInfo objects, and transforming instances of DTO classes from one type to another (for example, transforming a tv recording into a video).
+
+DAO
+Package DAO handles interfacing with persistent storage - i.e. the MythTV database. This is done in two ways: 1) direct SQL calls, and 2) calls to the MythTV API. It turns out that almost everything can be done via API calls, and direct database calls are required only to set MythVideo metadata.
+
+Both TV recordings and videos interface with persistent storage; orphans do not. Orphans are created directly from filesystem information -- in the SERVICE package a list of orphan files is prepared, and DTO.Orphan instances are created based on the file names and sizes and on information provided by the user. Those Orphans may, in turn, be transformed into Video instances, which will then use DAO classes to handle persistence.
+
  
