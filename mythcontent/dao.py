@@ -130,7 +130,7 @@ class ChannelApi(object):
         res_dict = self.api._call_myth_api(ChannelApi.__api_service_name, 'GetChannelInfo',
                  { 'ChanID': channel_id } )
         if 'Exception' in res_dict:
-            return None
+            raise Exception("Problem getting channel info for channel {}: {}".format(channel_id, res_dict['Exception']))
         else:
             return res_dict['ChannelInfo']
         
@@ -174,7 +174,7 @@ class TvRecordingApi(object):
       scheduled times, and do not reflect the fact that the recording may have started and/or
       ended at other than the scheduled times.
       
-    """
+    """Recording
     def get_mythtv_recording_list(self):
         res_dict = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'GetRecordedList')
         if 'Exception' in res_dict:
@@ -199,15 +199,72 @@ class TvRecordingApi(object):
       call to this method, causing MythTV to mark the recording
       as deleted, but MythTV has not yet done the actual
       erasure.
-    Side Effect:
-      * If the call succeeds, this recording will be removed
-      from self._tv_recordings.
+ 
     """
-    def erase(self, prog):
-        DATA = {'ChanId': prog['Channel']['ChanId'], 'StartTime': prog['Recording']['StartTs'] }
-        call_result = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'RemoveRecorded',
+    def erase(self, recording):
+        DATA = {'ChanId': recording.channel.channel_id, 'StartTime': recording.start_at }
+        res_dict = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'RemoveRecorded',
                                 data=DATA)
-        if not call_result['bool']:
-            raise Exception("Problem erasing MythTV recording: {}".format(call_result) )
+        if 'Exception' in res_dict:
+            raise Exception("Problem erasing MythTV recording: {}".format(res_dict['Exception']) )
         else:
-            return call_result['bool'] == 'true'
+            return 'bool' in res_dict and res_dict['bool'] == 'true'
+
+class VideoApi(object):
+    __instance = None # class attribute
+    __api_service_name = 'Video'
+    def __new__(cls):
+        if VideoApi.__instance is None:
+            VideoApi.__instance = object.__new__(cls)
+            VideoApi.__instance.api = MythApi()
+            VideoApi.__instance._videos = None
+            VideoApi.__instance.video_directory = VideoApi.__instance.api.storage_dir_for_name('Videos')
+            VideoApi.__instance.server_name = VideoApi.__instance.api.server_name 
+        return VideoApi.__instance
+    
+    def add_to_mythvideo(self, filename, hostname=None):
+        if hostname is None:
+            hostname = self.server_name
+        res_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'AddVideo',
+                 { 'FileName': filename, 'HostName': hostname} )
+        if 'Exception' in res_dict:
+            raise Exception("Problem adding MythVideo file {}: {}".format(filename, res_dict['Exception']) )
+        else:
+            return 'bool' in res_dict and res_dict['bool'] == 'true'
+        
+    def find_in_mythvideo(self, filename, hostname=None):
+        if hostname is None:
+            hostname = self.server_name
+        res_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'GetVideoByFileName',
+                 { 'FileName': filename } )
+        if 'Exception' in res_dict:
+            if res_dict['Exception'].getcode() == 500:
+                # probably just no such file
+                return None
+            else:
+                raise Exception("Problem finding MythVideo file {}: {}".format(filename, res_dict['Exception']) )
+        else:
+            return res_dict['VideoMetadataInfo']
+
+    """
+    Queries the MythAPI server for a list of the contents of MythVideo.
+    Pass: nothing
+    Return: a list, each element of which is an ordereddict with the following keys:
+         Id, Title, SubTitle, Tagline, Director, Studio, Description, Certification, Inetref, Collectionref,
+          HomePage, ReleaseDate, AddDate, UserRating, Length, PlayCount, Season, Episode, ParentalLevel,
+           Visible, Watched, Processed, ContentType, FileName, Hash, HostName, Coverart, Fanart, Banner,
+             Screenshot,  Trailer,  Artwork
+        Further, if el is one of the elements, then el['Artwork']['ArtworkInfos']['ArtworkInfo'] is
+        an ordered dict with the keys:
+            URL,  FileName,  StorageGroup,  Type
+         
+    """
+    def __fill_myth_video_list(self):
+        video_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'GetVideoList')
+        return video_dict['VideoMetadataInfoList']['VideoMetadataInfos']['VideoMetadataInfo']
+    
+    @property
+    def videos(self):
+        if self._videos is None:
+            self._videos = self.__fill_myth_video_list()
+        return self._videos

@@ -3,9 +3,8 @@ import os.path
 import re
 
 from mythcontent.constants import REC_FILENAME_DATE_FORMAT, BYTES_PER_MINUTE, MYTHTV_FILENAME_PATTERN
-from mythcontent.dao import ChannelApi, MythApi, TvRecordingApi
+from mythcontent.dao import ChannelApi, MythApi
 from mythcontent.utils import size_remote_file, ensure_tz_aware, ensure_utc, iso_to_tz_aware, time_diff_from_strings
-from fileinput import filename
 
 class Channel(object):
     def __init__(self,channel_id=None):
@@ -51,14 +50,33 @@ class ProgInfo(object):
 class OrphanDto(object):
     patt = re.compile(MYTHTV_FILENAME_PATTERN)
     def __init__(self,pinf = None,channel=None,start_at=None):
-        self.proginfo = pinf
+        self.pinf = pinf
         self.channel = channel
         self.start_at = start_at
+        
+    # Properties for convenience:
+    @property
+    def filename(self):
+        return self.pinf.filename
+    @property
+    def filesize(self):
+        return self.pinf.filesize
+    @property
+    def directory(self):
+        return self.pinf.directory
+    @property
+    def hostname(self):
+        return self.pinf.hostname
+    @property
+    def title(self):
+        return self.pinf.title
+    @property
+    def subtitle(self):
+        return self.pinf.subtitle
     
     @staticmethod
     def orphandto_from_proginfo(pinf):
-        o = OrphanDto()
-        o.proginfo = pinf
+        o = OrphanDto(pinf)
         (start_at, channel) = OrphanDto.parse_myth_filename(pinf.filename)
         o.start_at = start_at
         o.channel = channel
@@ -77,7 +95,6 @@ class OrphanDto(object):
         utc_dt=datetime.datetime.strptime(dt_portion,REC_FILENAME_DATE_FORMAT)
         utc_dt = ensure_tz_aware(utc_dt)
         utc_dt = ensure_utc(utc_dt)
-        channel = Channel(channel_id)
         return [ utc_dt, Channel(channel_id) ]
 
 """
@@ -103,9 +120,9 @@ class TvRecordingDto(object):
         for k,v in myth_prog_data.items():
             setattr(self,k.lower(),v)
         # But we want self.channel to be a Channel object,
-        # so "rename" self.channel to self.Channel:
-        self.Channel = self.channel
-        self.channel = Channel(self.Channel['ChanId'])
+        # so "rename" self.channel to self._Channel:
+        self._Channel = self.channel
+        self.channel = Channel(self._Channel['ChanId'])
 
         # The 'StartTs' and 'EndTs' fields are used to calculate the duration -- these represent the
         # actual start and end times of the recording; the fields 'StartTime' and 'EndTime' are the

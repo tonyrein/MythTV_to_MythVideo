@@ -38,12 +38,15 @@ class OrphanService(object):
     def load_from_directory(self, hostname, directory_name, filename_pattern='*.mpg'):
         # List all matching entries, but remove all which are not regular files:
         dirlist = stat_remote_host(hostname, directory_name + os.sep + filename_pattern, [ 'type', 'name', 'size' ])
-        dirlist = [ {'name': f['name'], 'size': f['size'] } for f in dirlist if f['type'] == 'regular file']
         ret_list = []
-        for f in dirlist:
-            pi = ProgInfo.proginfo_from_filespec(hostname, f['name'],f['size'])
-            if pi is not None:
-                ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
+        if dirlist and len(dirlist) > 0:
+            ts = TvRecordingService()
+            dirlist = [ {'name': f['name'], 'size': f['size'] } for f in dirlist if f['type'] == 'regular file']
+            for f in dirlist:
+                pi = ProgInfo.proginfo_from_filespec(hostname, f['name'],f['size'])
+                if pi is not None:
+                    if pi not in ts:
+                        ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
         return ret_list
         
     """
@@ -102,13 +105,18 @@ class TvRecordingService(object):
         if self._recordings is None:
             self._recordings = self.load_from_mythtv()
         return self._recordings
-     
+    
+    def __contains__(self,proginfo):
+        return proginfo.filename in [ r.filename for r in self.recordings ]
+    
     def contains_filename(self, fn):
         return fn in [ r.filename for r in self.recordings ]
       
     def erase_recording(self, recording_to_erase):
         return recording_to_erase.erase()
 
+class VideoService(object):
+    pass
 
 # import os
 # import iso8601
