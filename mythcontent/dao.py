@@ -23,9 +23,6 @@ import xmltodict
 
 from django.conf import settings
 
-
-
-
 class MythApi(object):
     __instance = None
     def __new__(cls, server_name=settings.API_SERVER, server_port=settings.API_PORT):
@@ -48,7 +45,7 @@ class MythApi(object):
     Raises:
       * HTTPError
     """
-    def _call_myth_api(self,service_name, call_name, data=None, headers={}):
+    def _call_myth_api(self,service_name, call_name, data=None, headers=None):
         # urlopen doesn't always work if headers is None:
         if headers is None:
             headers = {}
@@ -72,7 +69,6 @@ class MythApi(object):
         req = urllib.request.Request(url, data=DATA, headers=headers)
         if DATA:
             req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
-        
         try:
             with urllib.request.urlopen(req) as response:
                 the_answer = response.read()
@@ -142,3 +138,81 @@ class ChannelApi(object):
             return None
         else:
             return res_dict['ChannelInfo']
+        
+        
+class TvRecordingApi(object):
+    __instance = None # class attribute
+    __api_service_name = 'Dvr'
+    def __new__(cls):
+        if TvRecordingApi.__instance is None:
+            TvRecordingApi.__instance = object.__new__(cls)
+            TvRecordingApi.__instance.api = MythApi()
+            TvRecordingApi.__instance._tv_recordings = None
+        return TvRecordingApi.__instance
+    
+    """
+    Queries the MythAPI server for a list of the tv recordings.
+    Pass: nothing
+    Return: a list, each element of which is an ordereddict with the following keys:
+       StartTime, EndTime, Title, SubTitle, Category, CatType, Repeat, VideoProps,
+       AudioProps, SubProps, SeriesId, ProgramId, Stars, FileSize, LastModified, ProgramFlags,
+       FileName, HostName, Airdate, Description, Inetref, Season, Episode, Channel,
+       Recording, Artwork,
+       FileSpec, Duration
+       Note that the values for several of these keys (Channel, Recording, Artwork) are
+       ordereddicts in turn.
+       For Channel, the keys are:
+           ChanId,  ChanNum,  CallSign,  IconURL,  ChannelName,  MplexId,  TransportId,  ServiceId,
+            NetworkId,  ATSCMajorChan,  ATSCMinorChan,  Format,  Modulation,  Frequency,  FrequencyId,
+             FrequencyTable,  FineTune,  SIStandard,  ChanFilters,  SourceId,  InputId,  CommFree,
+              UseEIT,  Visible,  XMLTVID,  DefaultAuth,  Programs
+      For Recording, the keys are:
+        Status,  Priority,  StartTs,  EndTs,  RecordId,  RecGroup,  PlayGroup,  StorageGroup,  RecType,  DupInType,  DupMethod,  EncoderId,  Profile
+      For Artwork, the one key is:
+        ArtworkInfos
+        
+      The 'FileSpec' and 'Duration' keys/values are calculated by this method and added on to
+      the value returned by the Myth API call.
+      
+      The 'StartTs' and 'EndTs' fields are used to calculate the duration -- these represent the
+      actual start and end times of the recording; the fields 'StartTime' and 'EndTime' are the
+      scheduled times, and do not reflect the fact that the recording may have started and/or
+      ended at other than the scheduled times.
+      
+    """
+    def _get_mythtv_recording_list(self):
+        res_dict = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'GetRecordedList')
+        if 'Exception' in res_dict:
+            raise Exception("Problem getting MythTV recording list: {}".format(res_dict['Exception']))
+        else:
+            return res_dict['ProgramList']['Programs']['Program']
+    
+    """
+    Call MythTV api to remove this recording. If successful,
+    remove the recording from our internal list.
+    
+    Pass:
+      * Ordered Dict: the program to delete
+      (an element of self._tv_recordings) 
+    Return:
+      * True if call succeeds, False if it fails
+      (no such recording, for example)
+      
+      Note that if the recording has already been marked
+      as deleted in MythTV, this method will still return
+      True. This might occur if there has been a previous
+      call to this method, causing MythTV to mark the recording
+      as deleted, but MythTV has not yet done the actual
+      erasure.
+    Side Effect:
+      * If the call succeeds, this recording will be removed
+      from self._tv_recordings.
+    """
+    def erase(self, prog):
+        DATA = {'ChanId': prog['Channel']['ChanId'], 'StartTime': prog['Recording']['StartTs'] }
+        call_result = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'RemoveRecorded',
+                                data=DATA)
+        if not call_result['bool']:
+            raise Exception("Problem erasing MythTV recording: {}".format(call_result) )
+        else:
+            return call_result['bool'] == 'true'

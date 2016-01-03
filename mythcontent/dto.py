@@ -3,7 +3,7 @@ import os.path
 import re
 
 from mythcontent.constants import REC_FILENAME_DATE_FORMAT, BYTES_PER_MINUTE, MYTHTV_FILENAME_PATTERN
-from mythcontent.dao import ChannelApi
+from mythcontent.dao import ChannelApi, TvRecordingApi
 from mythcontent.utils import size_remote_file, ensure_tz_aware, ensure_utc
 
 class Channel(object):
@@ -79,6 +79,23 @@ class OrphanDto(object):
         channel = Channel(channel_id)
         return [ utc_dt, Channel(channel_id) ]
 
+"""
+ This class is responsible for manipulating a single
+ MythTV recorded program.
+ """
+class TvRecording(object):
+     def __init__(self, myth_prog_data):
+        self.pinf = ProgInfo()
+         # Set attributes of pinf from values in myth_prog_data dict:
+        self.pinf.filename = None
+        self.pinf.directory = None
+        self.pinf.hostname = None
+        self.pinf.filesize = 0
+        self.pinf.title = None
+        self.pinf.subtitle
+         
+         self.prog = prog
+ 
 
 # import datetime
 # import os
