@@ -3,8 +3,9 @@ import os.path
 import re
 
 from mythcontent.constants import REC_FILENAME_DATE_FORMAT, BYTES_PER_MINUTE, MYTHTV_FILENAME_PATTERN
-from mythcontent.dao import ChannelApi, TvRecordingApi
-from mythcontent.utils import size_remote_file, ensure_tz_aware, ensure_utc
+from mythcontent.dao import ChannelApi, MythApi, TvRecordingApi
+from mythcontent.utils import size_remote_file, ensure_tz_aware, ensure_utc, iso_to_tz_aware, time_diff_from_strings
+from fileinput import filename
 
 class Channel(object):
     def __init__(self,channel_id=None):
@@ -81,21 +82,61 @@ class OrphanDto(object):
 
 """
  This class is responsible for manipulating a single
- MythTV recorded program.
+ MythTV recorded program. Note that it stores all the
+ information MythTV knows about a recording, even though
+ a lot of that information may not be needed just yet.
  """
-class TvRecording(object):
-     def __init__(self, myth_prog_data):
+class TvRecordingDto(object):
+    def __init__(self, myth_prog_data):
         self.pinf = ProgInfo()
-         # Set attributes of pinf from values in myth_prog_data dict:
-        self.pinf.filename = None
-        self.pinf.directory = None
-        self.pinf.hostname = None
-        self.pinf.filesize = 0
-        self.pinf.title = None
-        self.pinf.subtitle
-         
-         self.prog = prog
- 
+        # Set attributes of pinf from values in myth_prog_data dict:
+        self.pinf.filename = myth_prog_data.pop('FileName')
+        self.pinf.hostname = myth_prog_data.pop('HostName')
+        self.pinf.filesize = myth_prog_data.pop('FileSize')
+        self.pinf.title = myth_prog_data.pop('Title')
+        self.pinf.subtitle = myth_prog_data.pop('SubTitle')
+        sg = myth_prog_data['Recording']['StorageGroup']
+        api = MythApi()
+        self.pinf.directory = api.storage_dir_for_name(sg, self.pinf.hostname)
+
+        # Set other attributes from items in myth_prog_data:
+        for k,v in myth_prog_data.items():
+            setattr(self,k.lower(),v)
+        # But we want self.channel to be a Channel object,
+        # so "rename" self.channel to self.Channel:
+        self.Channel = self.channel
+        self.channel = Channel(self.Channel['ChanId'])
+
+        # The 'StartTs' and 'EndTs' fields are used to calculate the duration -- these represent the
+        # actual start and end times of the recording; the fields 'StartTime' and 'EndTime' are the
+        # scheduled times, and do not reflect the fact that the recording may have started and/or
+        # ended at other than the scheduled times.
+        end_time_str = myth_prog_data['Recording']['EndTs']
+        start_time_str = myth_prog_data['Recording']['StartTs']
+        self.duration = time_diff_from_strings(start_time_str, end_time_str) # in seconds
+        # while we're at it, save the starting and ending times as datetime.datetime objects:
+        self.start_at = iso_to_tz_aware(start_time_str)
+        self.end_at = iso_to_tz_aware(end_time_str)
+        
+    # some properties, for convenience:
+    @property
+    def filename(self):
+        return self.pinf.filename
+    @property
+    def filesize(self):
+        return self.pinf.filesize
+    @property
+    def directory(self):
+        return self.pinf.directory
+    @property
+    def hostname(self):
+        return self.pinf.hostname
+    @property
+    def title(self):
+        return self.pinf.title
+    @property
+    def subtitle(self):
+        return self.pinf.subtitle
 
 # import datetime
 # import os

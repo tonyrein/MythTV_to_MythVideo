@@ -1,8 +1,10 @@
 import os
 
 from nonpublic.settings import ORPHANS
-from mythcontent.dto import OrphanDto, ProgInfo
+from mythcontent.dto import OrphanDto, ProgInfo, TvRecordingDto
 from mythcontent.utils import stat_remote_host
+from mythcontent.dao import MythApi, TvRecordingApi
+
 
 class OrphanService(object):
     __instance = None
@@ -39,13 +41,9 @@ class OrphanService(object):
         dirlist = [ {'name': f['name'], 'size': f['size'] } for f in dirlist if f['type'] == 'regular file']
         ret_list = []
         for f in dirlist:
-            print(f)
             pi = ProgInfo.proginfo_from_filespec(hostname, f['name'],f['size'])
-            if pi is None:
-                print("pi for {}, {} is None".format(f['name'], f['size']) )
-            else:
-                print(pi)
-            ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
+            if pi is not None:
+                ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
         return ret_list
         
     """
@@ -53,8 +51,7 @@ class OrphanService(object):
     to the file.
     
     The file created by this method is for persistent storage
-    and not for display. Use export_for_display() to
-    present the data to the user for editing.
+    and not for display. 
     """
     def save_to_file(self,filename):
         pass
@@ -83,6 +80,7 @@ class OrphanService(object):
             self.load_orphan_list()
         return self._orphan_list
 
+    
 
 class TvRecordingService(object):
     __instance = None # class attribute
@@ -95,8 +93,8 @@ class TvRecordingService(object):
      
     def load_from_mythtv(self):
         ret_list = []
-        for r in self._api.tv_recordings:
-            ret_list.append(TvRecording(r))
+        for r in self._api.get_mythtv_recording_list():
+            ret_list.append(TvRecordingDto(r))
         return ret_list
          
     @property

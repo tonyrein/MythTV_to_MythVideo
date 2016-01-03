@@ -31,7 +31,7 @@ class MythApi(object):
             MythApi.__instance.server_name = server_name
             MythApi.__instance.server_port = server_port
             MythApi.__instance._storage_groups = MythApi.__instance._fill_myth_storage_group_list()
-            MythApi.__instance.default_directory = MythApi.__instance.storage_dir_for_name('Default')
+            MythApi.__instance.default_directory = MythApi.__instance.storage_dir_for_name('Default', server_name)
         return MythApi.__instance
     """
     Make a call to the MythTV API and request XML back from MythTV server.
@@ -96,20 +96,15 @@ class MythApi(object):
         return self._storage_groups    
     
     """
-    Pass:
-        * Storage group name
-        * (Optional) host name
-        If host name is None, use settings.API_SERVER
+    Pass: Storage group name and host name
     Return: Disk directory, or None if no match.
     
-    Assumes: host is same as self.server_name
     """
-    def storage_dir_for_name(self, group_name, hostname=settings.API_SERVER):
+    def storage_dir_for_name(self, group_name, hostname):
         for g in self.storage_groups:
             if g['GroupName'] == group_name and g['HostName'] == hostname:
                 return g['DirName']
-        return None    
-
+        return None 
 
 class ChannelApi(object):
     __instance = None # class attribute
@@ -180,7 +175,7 @@ class TvRecordingApi(object):
       ended at other than the scheduled times.
       
     """
-    def _get_mythtv_recording_list(self):
+    def get_mythtv_recording_list(self):
         res_dict = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'GetRecordedList')
         if 'Exception' in res_dict:
             raise Exception("Problem getting MythTV recording list: {}".format(res_dict['Exception']))
