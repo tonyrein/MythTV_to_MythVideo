@@ -1,4 +1,5 @@
 import datetime
+import json
 import os.path
 import re
 
@@ -18,6 +19,9 @@ class Channel(object):
             chan_info = api.get_channel_info(channel_id)
             self.channel_number = chan_info['ChanNum']
             self.channel_name = chan_info['ChannelName']
+            
+    def __repr__(self):
+        return json.dumps(self.__dict__)
          
 
 class ProgInfo(object):
@@ -31,7 +35,10 @@ class ProgInfo(object):
     
     def __str__(self):
         return "{} {} {} {} {} {}".format(self.filename, self.directory, self.hostname, self.filesize, self.title, self.subtitle)
-        
+    
+    def __repr__(self):
+        return json.dumps(self.__dict__) 
+    
     @staticmethod
     def proginfo_from_filespec(hostname, filespec, filesize=None):
         pinf = ProgInfo()
@@ -53,7 +60,15 @@ class OrphanDto(object):
         self.pinf = pinf
         self.channel = channel
         self.start_at = start_at
-        
+    
+    def __repr__(self):
+        d = self.__dict__
+        d['pinf'] = self.pinf.__repr__()
+        d['channel'] = self.channel.__repr__()
+        d['start_at'] = self.start_at.__repr__()
+        return json.dumps(d)
+    
+       
     # Properties for convenience:
     @property
     def filename(self):

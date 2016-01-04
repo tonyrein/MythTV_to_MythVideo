@@ -174,7 +174,7 @@ class TvRecordingApi(object):
       scheduled times, and do not reflect the fact that the recording may have started and/or
       ended at other than the scheduled times.
       
-    """Recording
+    """
     def get_mythtv_recording_list(self):
         res_dict = self.api._call_myth_api(TvRecordingApi.__api_service_name, 'GetRecordedList')
         if 'Exception' in res_dict:
