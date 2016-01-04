@@ -55,12 +55,30 @@ class ProgInfo(object):
 
 
 class OrphanDto(object):
+    # class objects:
     patt = re.compile(MYTHTV_FILENAME_PATTERN)
-    def __init__(self,pinf = None,channel=None,start_at=None):
-        self.pinf = pinf
-        self.channel = channel
-        self.start_at = start_at
-    
+    channel_api = ChannelApi()
+#     def __init__(self,pinf = None,channel=None,start_at=None):
+#         self.pinf = pinf
+#         self.channel = channel
+#         self.start_at = start_at
+#     
+    def __init__(self,hostname,filespec,filesize=None,title='',subtitle=''):
+        if hostname is None or filespec is None:
+            raise ValueError("Hostname and filespec required to build OrphanDto object.")
+        self.hostname = hostname
+        self.directory,self.filename = os.path.split(filespec)
+        self.title = title
+        self.subtitle = subtitle
+        if filesize is None:
+            filesize = size_remote_file(hostname,filespec)
+        self.filesize = int(filesize)
+        self.duration = round( self.filesize/BYTES_PER_MINUTE )
+        (self.start_at, channel_id) = OrphanDto.parse_myth_filename(self.filename)
+        self.channel = OrphanDto.channel_api.get_channel_info(channel_id)
+        
+            
+            
     def __repr__(self):
         d = self.__dict__
         d['pinf'] = self.pinf.__repr__()
@@ -68,26 +86,17 @@ class OrphanDto(object):
         d['start_at'] = self.start_at.__repr__()
         return json.dumps(d)
     
-       
-    # Properties for convenience:
+    # For convenience ...
     @property
-    def filename(self):
-        return self.pinf.filename
+    def channel_number(self):
+        return self.channel['ChanNum']
     @property
-    def filesize(self):
-        return self.pinf.filesize
+    def channel_id(self):
+        return self.channel['ChanId']
     @property
-    def directory(self):
-        return self.pinf.directory
-    @property
-    def hostname(self):
-        return self.pinf.hostname
-    @property
-    def title(self):
-        return self.pinf.title
-    @property
-    def subtitle(self):
-        return self.pinf.subtitle
+    def channel_name(self):
+        return self.channel['ChannelName']
+   
     
     @staticmethod
     def orphandto_from_proginfo(pinf):
@@ -107,10 +116,12 @@ class OrphanDto(object):
         # split filename into components:
         (channel_id,rest) = filename.split('_')
         dt_portion=rest[:14]
-        utc_dt=datetime.datetime.strptime(dt_portion,REC_FILENAME_DATE_FORMAT)
-        utc_dt = ensure_tz_aware(utc_dt)
-        utc_dt = ensure_utc(utc_dt)
-        return [ utc_dt, Channel(channel_id) ]
+        #dt_portion is a timestamp in the format: YYYYMMDDHHMMSS. The
+        # timezone is not given in the string, but it is UTC.
+        # Just in case this ever gets used by external code, make the format
+        # consistent with iso8601 and specify the timezone:
+        utc_dt = "{}-{}-{}T{}:{}:{}Z".format(dt_portion[0:4], dt_portion[4:6], dt_portion[6:8], dt_portion[8:10], dt_portion[10:12], dt_portion[12:14])
+        return [ utc_dt, channel_id ]
 
 """
  This class is responsible for manipulating a single

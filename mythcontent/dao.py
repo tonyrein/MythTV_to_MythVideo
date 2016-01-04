@@ -35,48 +35,17 @@ class MythApi(object):
             MythApi.__instance.default_directory = MythApi.__instance.storage_dir_for_name('Default', server_name)
         return MythApi.__instance
     """
-    Make a call to the MythTV API and request XML back from MythTV server.
+    Make a call to the MythTV API and request JSON back from MythTV server.
     Pass:
       * name of API service
       * name of API call within service
       * data (optional) - a dict of parameters for the call
       * headers (optional)
     Returns:
-      * An ordereddict created by parsing the XML returned from the MythTV server
+      * A JSON object built from the data returned from the MythTV server
     Raises:
       * HTTPError
     """
-#     def _call_myth_api(self,service_name, call_name, data=None, headers=None):
-#         # urlopen doesn't always work if headers is None:
-#         if headers is None:
-#             headers = {}
-#         # Does headers contain 'Accept'? If so, make sure it's not asking for JSON.
-#         if 'Accept' in headers:
-#             if headers['Accept'] in [ 'text/javascript', 'application/json' ]:
-#                 del headers['Accept']
-#         
-#         if data:
-#             DATA=urllib.parse.urlencode(data)
-#             DATA=DATA.encode('utf-8')
-#         else:
-#             DATA=None
-#         
-#         # Assemble url:
-#         url = (
-#             "http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
-#             )
-#         # Make a Request object and pass it to the server.
-#         # Use the returned result to make some XML to return to our caller
-#         req = urllib.request.Request(url, data=DATA, headers=headers)
-#         if DATA:
-#             req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
-#         try:
-#             with urllib.request.urlopen(req) as response:
-#                 the_answer = response.read()
-#                 return xmltodict.parse(the_answer)
-#         except Exception as e:
-#             return OrderedDict( { 'Exception': e } )
-#         
     def _call_myth_api(self,service_name, call_name, data=None, headers=None):
         # urlopen doesn't always work if headers is None:
         if headers is None:
@@ -106,7 +75,9 @@ class MythApi(object):
                     the_answer = the_answer.decode('utf-8')
                     return json.loads(the_answer)
         except Exception as e:
-            return OrderedDict( { 'Exception': e } )
+            return { 'Exception': e.__repr__() }
+#             return d
+#             return json.loads("{'Exception':" + e.__repr__() + "}")
         
         
     """
@@ -117,8 +88,8 @@ class MythApi(object):
        Id,  GroupName,  HostName,  DirName
     """
     def _fill_myth_storage_group_list(self):
-        sgxml = self._call_myth_api('Myth', 'GetStorageGroupDirs')
-        return sgxml['StorageGroupDirList']['StorageGroupDirs']['StorageGroupDir']
+        j = self._call_myth_api('Myth', 'GetStorageGroupDirs')
+        return j['StorageGroupDirList']['StorageGroupDirs']
     
     """
     storage_groups() is a property because
@@ -133,7 +104,9 @@ class MythApi(object):
     Return: Disk directory, or None if no match.
     
     """
-    def storage_dir_for_name(self, group_name, hostname):
+    def storage_dir_for_name(self, group_name, hostname=None):
+        if hostname is None:
+            hostname = self.server_name
         for g in self.storage_groups:
             if g['GroupName'] == group_name and g['HostName'] == hostname:
                 return g['DirName']
@@ -213,14 +186,13 @@ class TvRecordingApi(object):
         if 'Exception' in res_dict:
             raise Exception("Problem getting MythTV recording list: {}".format(res_dict['Exception']))
         else:
-            return res_dict['ProgramList']['Programs']['Program']
-    
+            return res_dict['ProgramList']['Programs']
     """
     Call MythTV api to remove this recording. If successful,
     remove the recording from our internal list.
     
     Pass:
-      * Ordered Dict: the program to delete
+      * JSON object: the program to delete
       (an element of self._tv_recordings) 
     Return:
       * True if call succeeds, False if it fails
@@ -282,19 +254,18 @@ class VideoApi(object):
     """
     Queries the MythAPI server for a list of the contents of MythVideo.
     Pass: nothing
-    Return: a list, each element of which is an ordereddict with the following keys:
+    Return: a list, each element of which is a JSON object with the following keys:
          Id, Title, SubTitle, Tagline, Director, Studio, Description, Certification, Inetref, Collectionref,
           HomePage, ReleaseDate, AddDate, UserRating, Length, PlayCount, Season, Episode, ParentalLevel,
            Visible, Watched, Processed, ContentType, FileName, Hash, HostName, Coverart, Fanart, Banner,
              Screenshot,  Trailer,  Artwork
         Further, if el is one of the elements, then el['Artwork']['ArtworkInfos']['ArtworkInfo'] is
-        an ordered dict with the keys:
+        a JSON object with the keys:
             URL,  FileName,  StorageGroup,  Type
-         
     """
     def __fill_myth_video_list(self):
         video_dict = self.api._call_myth_api(VideoApi.__api_service_name, 'GetVideoList')
-        return video_dict['VideoMetadataInfoList']['VideoMetadataInfos']['VideoMetadataInfo']
+        return video_dict['VideoMetadataInfoList']['VideoMetadataInfos']
     
     @property
     def videos(self):
