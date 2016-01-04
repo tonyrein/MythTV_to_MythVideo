@@ -18,8 +18,9 @@ this class is a singleton.
 
 '''
 from collections import OrderedDict
+import json
 import urllib.request
-import xmltodict
+# import xmltodict
 
 from django.conf import settings
 
@@ -45,14 +46,43 @@ class MythApi(object):
     Raises:
       * HTTPError
     """
+#     def _call_myth_api(self,service_name, call_name, data=None, headers=None):
+#         # urlopen doesn't always work if headers is None:
+#         if headers is None:
+#             headers = {}
+#         # Does headers contain 'Accept'? If so, make sure it's not asking for JSON.
+#         if 'Accept' in headers:
+#             if headers['Accept'] in [ 'text/javascript', 'application/json' ]:
+#                 del headers['Accept']
+#         
+#         if data:
+#             DATA=urllib.parse.urlencode(data)
+#             DATA=DATA.encode('utf-8')
+#         else:
+#             DATA=None
+#         
+#         # Assemble url:
+#         url = (
+#             "http://{}:{}/{}/{}".format(self.server_name, self.server_port, service_name, call_name)
+#             )
+#         # Make a Request object and pass it to the server.
+#         # Use the returned result to make some XML to return to our caller
+#         req = urllib.request.Request(url, data=DATA, headers=headers)
+#         if DATA:
+#             req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
+#         try:
+#             with urllib.request.urlopen(req) as response:
+#                 the_answer = response.read()
+#                 return xmltodict.parse(the_answer)
+#         except Exception as e:
+#             return OrderedDict( { 'Exception': e } )
+#         
     def _call_myth_api(self,service_name, call_name, data=None, headers=None):
         # urlopen doesn't always work if headers is None:
         if headers is None:
             headers = {}
-        # Does headers contain 'Accept'? If so, make sure it's not asking for JSON.
-        if 'Accept' in headers:
-            if headers['Accept'] in [ 'text/javascript', 'application/json' ]:
-                del headers['Accept']
+        # Tell server to send back JSON:
+        headers['Accept'] = 'application/json'
         
         if data:
             DATA=urllib.parse.urlencode(data)
@@ -72,9 +102,12 @@ class MythApi(object):
         try:
             with urllib.request.urlopen(req) as response:
                 the_answer = response.read()
-                return xmltodict.parse(the_answer)
+                if the_answer:
+                    the_answer = the_answer.decode('utf-8')
+                    return json.loads(the_answer)
         except Exception as e:
             return OrderedDict( { 'Exception': e } )
+        
         
     """
     Gets list of storage groups available to
