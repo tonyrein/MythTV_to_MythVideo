@@ -1,0 +1,2 @@
+DATE_DISPLAY_FORMAT='%a, %m/%d/%Y'
+TIME_DISPLAY_FORMAT='%-I:%M %p'

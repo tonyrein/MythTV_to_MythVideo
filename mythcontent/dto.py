@@ -5,7 +5,7 @@ import re
 
 from mythcontent.constants import REC_FILENAME_DATE_FORMAT, BYTES_PER_MINUTE, MYTHTV_FILENAME_PATTERN
 from mythcontent.dao import ChannelApi, MythApi
-from mythcontent.utils import size_remote_file, ensure_tz_aware, ensure_utc, iso_to_tz_aware, time_diff_from_strings
+from mythcontent.utils import size_remote_file, ensure_tz_aware, ensure_utc, iso_to_tz_aware, utc_dt_to_local_dt, time_diff_from_strings
 
 class Channel(object):
     def __init__(self,channel_id=None):
@@ -96,10 +96,13 @@ class OrphanDto(object):
         dt_portion=rest[:14]
         #dt_portion is a timestamp in the format: YYYYMMDDHHMMSS. The
         # timezone is not given in the string, but it is UTC.
-        # Just in case this ever gets used by external code, make the format
-        # consistent with iso8601 and specify the timezone:
-        utc_dt = "{}-{}-{}T{}:{}:{}Z".format(dt_portion[0:4], dt_portion[4:6], dt_portion[6:8], dt_portion[8:10], dt_portion[10:12], dt_portion[12:14])
-        return [ utc_dt, channel_id ]
+        # Make a UTC datetime object from it, then change to local timezone:
+        utc_dt = datetime.datetime.strptime(dt_portion,REC_FILENAME_DATE_FORMAT)
+        utc_dt = ensure_tz_aware(utc_dt)
+        utc_dt = ensure_utc(utc_dt)
+        local_dt = utc_dt_to_local_dt(utc_dt)
+
+        return [ local_dt, channel_id ]
 
 """
  This class is responsible for manipulating a single

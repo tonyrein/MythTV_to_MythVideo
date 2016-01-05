@@ -1,13 +1,13 @@
-{% if request.session.orphans_list %}
+{% if session.orphan_list %}
 	 {% csrf_token %}
 	<ul>
-	{% for o in request.session.orphans_list|dictsort:"title" %}
+	{% for o in orphan_list|dictsort:"title" %}
 		<li>
 		<input type="checkbox" name="selected_programs"
 		value={{o.filename}} />
-		{{o.title}}<br> {{o.subtitle}}<br>
-		Recording was on channel {{o.channel.channel_number}} ({{o.channel.channel_name}}).
-		It started at {{o.start_at}} and lasted {{o.duration}}<br>
+		{{ o.title}}<br> {{ o.subtitle}}<br>
+		Recording was on channel {{o.channel.ChanNum}} ({{o.channel.ChannelName}}).
+		It started on {{o.date}} at {{o.time}} and lasted {{o.duration}} minutes.<br>
 		The file name is {{o.filename}}
 		</li><br>
 	{% endfor %}

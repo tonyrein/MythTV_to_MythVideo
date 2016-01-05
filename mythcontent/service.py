@@ -4,7 +4,7 @@ from nonpublic.settings import ORPHANS
 from mythcontent.dto import OrphanDto, ProgInfo, TvRecordingDto
 from mythcontent.utils import stat_remote_host
 from mythcontent.dao import MythApi, TvRecordingApi
-
+from nonpublic.models import Orphan
 
 class OrphanService(object):
     __instance = None
@@ -43,13 +43,57 @@ class OrphanService(object):
             ts = TvRecordingService()
             dirlist = [ {'name': f['name'], 'size': f['size'] } for f in dirlist if f['type'] == 'regular file']
             for f in dirlist:
-                if f not in ts:
+                if f['name'] not in ts:
                     ret_list.append(OrphanDto(hostname, f['name'],f['size']))
 #                 pi = ProgInfo.proginfo_from_filespec(hostname, f['name'],f['size'])
 #                 if pi is not None:
 #                     if pi not in ts:
 #                         ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
         return ret_list
+    
+    """
+    This takes the in-memory list of orphans
+    and adds them to the Django sqlite database 'orphans' table.
+    Intended to be used to initialize the database on the first run
+    of the app.
+    
+    If 'override' is False (the default) the method will raise a
+    ValueError if it's called when there are already records in
+    the orphans table.
+    
+    If override is true, the method will attempt to add records
+    to the orphans table even if there are pre-existing records;
+    however, if the table's filename<->hostname unique constraint
+    is violated, a django.db.IntegrityError will be raised.
+    
+    """
+    def save_to_db(self, override=False):
+        if not override and Orphan.objects.count() > 0:
+            raise ValueError("OrphanService.save_to_db called with records already in orphans table.")
+        for item in self.orphan_list:
+            o = Orphan()
+            o.hostname = item.hostname
+            o.directory = item.directory
+            o.filename = item.filename
+            o.filesize = item.filesize
+            o.duration = item.duration
+            o.channel_id = item.channel_id
+            o.channel_number = int(item.channel_number)
+            o.channel_name = item.channel_name
+            o.start_date = item.start_at.date()
+            o.start_time = item.start_at.time()
+            o.title = item.title
+            o.subtitle = item.subtitle
+            o.save()
+#          
+#          filename = models.CharField(max_length=20)
+#     filesize = models.BigIntegerField(blank=True, default=0)
+#     start_date = models.DateField()
+#     start_time = models.TimeField()
+#     subtitle = models.TextField(blank=True, default='')
+#     channel_id = models.CharField(max_length=4)
+#     channel_number = models.SmallIntegerField()
+#     channel_name 
         
     """
     Write the list of OrphanDto objects

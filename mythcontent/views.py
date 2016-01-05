@@ -1,7 +1,11 @@
+import datetime
+
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 
+from mythcontent.settings import DATE_DISPLAY_FORMAT, TIME_DISPLAY_FORMAT
 from mythcontent.service import OrphanService, TvRecordingService, VideoService
 
 
@@ -31,11 +35,22 @@ def index(request):
     return HttpResponse(template.render(context))
 #     return render(request, 'mythcontent/index.html')
 
-def orphans(request):
+
+
+def orphans1(request):
     os = OrphanService()
-    request.session['orphan_list'] = os.orphan_list
+    sess_list = []
+    for o in os.orphan_list:
+        d = o.__dict__
+        # Put formatted strings into dict to be passed to template...
+        d['date'] = datetime.datetime.strftime(o.start_at, DATE_DISPLAY_FORMAT)
+        d['time'] = datetime.datetime.strftime(o.start_at, TIME_DISPLAY_FORMAT)
+        d.pop('start_at') # remove this, since it's not JSON-serializable
+        sess_list.append(d)
+        
+#     request.session['orphan_list'] = sess_list
     template = loader.get_template('mythcontent/orphans.html')
-    context = RequestContext(request,)
+    context = RequestContext(request, { 'orphan_list': sess_list })
     return HttpResponse(template.render(context))
 
 def videos(request):
