@@ -43,10 +43,12 @@ class OrphanService(object):
             ts = TvRecordingService()
             dirlist = [ {'name': f['name'], 'size': f['size'] } for f in dirlist if f['type'] == 'regular file']
             for f in dirlist:
-                pi = ProgInfo.proginfo_from_filespec(hostname, f['name'],f['size'])
-                if pi is not None:
-                    if pi not in ts:
-                        ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
+                if f not in ts:
+                    ret_list.append(OrphanDto(hostname, f['name'],f['size']))
+#                 pi = ProgInfo.proginfo_from_filespec(hostname, f['name'],f['size'])
+#                 if pi is not None:
+#                     if pi not in ts:
+#                         ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
         return ret_list
         
     """
@@ -106,8 +108,8 @@ class TvRecordingService(object):
             self._recordings = self.load_from_mythtv()
         return self._recordings
     
-    def __contains__(self,proginfo):
-        return proginfo.filename in [ r.filename for r in self.recordings ]
+    def __contains__(self,filename):
+        return filename in [ r.filename for r in self.recordings ]
     
     def contains_filename(self, fn):
         return fn in [ r.filename for r in self.recordings ]

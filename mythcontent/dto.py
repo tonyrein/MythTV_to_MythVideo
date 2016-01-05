@@ -58,11 +58,7 @@ class OrphanDto(object):
     # class objects:
     patt = re.compile(MYTHTV_FILENAME_PATTERN)
     channel_api = ChannelApi()
-#     def __init__(self,pinf = None,channel=None,start_at=None):
-#         self.pinf = pinf
-#         self.channel = channel
-#         self.start_at = start_at
-#     
+
     def __init__(self,hostname,filespec,filesize=None,title='',subtitle=''):
         if hostname is None or filespec is None:
             raise ValueError("Hostname and filespec required to build OrphanDto object.")
@@ -78,14 +74,6 @@ class OrphanDto(object):
         self.channel = OrphanDto.channel_api.get_channel_info(channel_id)
         
             
-            
-    def __repr__(self):
-        d = self.__dict__
-        d['pinf'] = self.pinf.__repr__()
-        d['channel'] = self.channel.__repr__()
-        d['start_at'] = self.start_at.__repr__()
-        return json.dumps(d)
-    
     # For convenience ...
     @property
     def channel_number(self):
@@ -97,16 +85,6 @@ class OrphanDto(object):
     def channel_name(self):
         return self.channel['ChannelName']
    
-    
-    @staticmethod
-    def orphandto_from_proginfo(pinf):
-        o = OrphanDto(pinf)
-        (start_at, channel) = OrphanDto.parse_myth_filename(pinf.filename)
-        o.start_at = start_at
-        o.channel = channel
-        o.duration = round( pinf.filesize/BYTES_PER_MINUTE )
-        return o
-        
     @staticmethod
     def parse_myth_filename(filename):
         # Verify filename fits pattern - "\d{4}_\d{14}\."
