@@ -1,13 +1,17 @@
 import datetime
+import os
 
-
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
+
+from django_tables2 import RequestConfig
 
 from mythcontent.settings import DATE_DISPLAY_FORMAT, TIME_DISPLAY_FORMAT
 from mythcontent.service import OrphanService, TvRecordingService, VideoService
 from nonpublic.models import Orphan
+
+from mythcontent.datagrids import OrphanTable
 
 # Create your views here.
 
@@ -48,11 +52,24 @@ def orphans1(request):
         d.pop('start_at') # remove this, since it's not JSON-serializable
         sess_list.append(d)
 
-def orphans(request):
+def orphans2(request):
     olist = Orphan.objects.all() 
 #     request.session['orphan_list'] = sess_list
     template = loader.get_template('mythcontent/orphans.html')
     context = RequestContext(request, { 'orphan_list': olist })
+    return HttpResponse(template.render(context))
+
+def orphans(request):
+    table = OrphanTable(Orphan.objects.all())
+    RequestConfig(request).configure(table)
+    return render(request,'mythcontent/orphans.html', { 'orphan_list': table })
+
+
+def play_file(request, pk):
+    orphan = get_object_or_404(Orphan, intid=pk)
+    orphan.fullspec = orphan.directory + os.sep + orphan.filename
+    template = loader.get_template('mythcontent/play_file.html')
+    context = RequestContext(request, { 'orphan': orphan })
     return HttpResponse(template.render(context))
 
 def videos(request):

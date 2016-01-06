@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+    <head>
+	<link rel="stylesheet" href="{{ STATIC_URL }}django_tables2/themes/paleblue/css/screen.css" />
+    </head>
+    <body>
+    	<H1>Playing Orphan File</H1>
+    	<hr/>
+    	<h2>File recorded {{ orphan.start_date }} at {{ orphan.start_time }}</h2>
+    	<h2>Duration: {{ orphan.duration }} minutes</h2>
+    	<h2>Recorded on channel {{ orphan.channel_number }} ({{orphan.channel_name}})</h2>
+    	<hr/>
+    	<video name='view', controls, autoplay, width='50%', height='40%'>
+    		<source src={{orphan.filename}} ></source>
+    	
+    	
+    	</video>
+    </body>
+</html>
