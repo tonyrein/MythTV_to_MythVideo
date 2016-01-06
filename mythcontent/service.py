@@ -43,12 +43,9 @@ class OrphanService(object):
             ts = TvRecordingService()
             dirlist = [ {'name': f['name'], 'size': f['size'] } for f in dirlist if f['type'] == 'regular file']
             for f in dirlist:
-                if f['name'] not in ts:
+                directory,filename = os.path.split(f['name'])
+                if filename not in ts:
                     ret_list.append(OrphanDto(hostname, f['name'],f['size']))
-#                 pi = ProgInfo.proginfo_from_filespec(hostname, f['name'],f['size'])
-#                 if pi is not None:
-#                     if pi not in ts:
-#                         ret_list.append(OrphanDto.orphandto_from_proginfo(pi))
         return ret_list
     
     """
@@ -85,16 +82,7 @@ class OrphanService(object):
             o.title = item.title
             o.subtitle = item.subtitle
             o.save()
-#          
-#          filename = models.CharField(max_length=20)
-#     filesize = models.BigIntegerField(blank=True, default=0)
-#     start_date = models.DateField()
-#     start_time = models.TimeField()
-#     subtitle = models.TextField(blank=True, default='')
-#     channel_id = models.CharField(max_length=4)
-#     channel_number = models.SmallIntegerField()
-#     channel_name 
-        
+       
     """
     Write the list of OrphanDto objects
     to the file.

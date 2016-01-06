@@ -70,6 +70,8 @@ class OrphanDto(object):
             filesize = size_remote_file(hostname,filespec)
         self.filesize = int(filesize)
         self.duration = round( self.filesize/BYTES_PER_MINUTE )
+        if self.duration is None:
+            self.duration = 0
         (self.start_at, channel_id) = OrphanDto.parse_myth_filename(self.filename)
         self.channel = OrphanDto.channel_api.get_channel_info(channel_id)
         

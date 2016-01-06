@@ -49,10 +49,10 @@ def orphans1(request):
         sess_list.append(d)
 
 def orphans(request):
-    olist = [ o for o in Orphan.objects.all() ]
+    olist = Orphan.objects.all() 
 #     request.session['orphan_list'] = sess_list
     template = loader.get_template('mythcontent/orphans.html')
-    context = RequestContext(request, { 'orphan_list': list(olist) })
+    context = RequestContext(request, { 'orphan_list': olist })
     return HttpResponse(template.render(context))
 
 def videos(request):

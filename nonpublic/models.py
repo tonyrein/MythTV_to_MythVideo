@@ -8,6 +8,7 @@ class Orphan(models.Model):
     directory = models.CharField(max_length=256)
     filename = models.CharField(max_length=20)
     filesize = models.BigIntegerField(blank=True, default=0)
+    duration = models.SmallIntegerField(blank=True, default=0)
     start_date = models.DateField()
     start_time = models.TimeField()
     subtitle = models.TextField(blank=True, default='')
