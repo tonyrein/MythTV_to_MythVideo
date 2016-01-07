@@ -1,6 +1,6 @@
 
 import django_tables2 as tables
-from django_tables2.utils import A  # alias for Accessor
+from django_tables2.utils import Accessor, A  # alias for Accessor
 from nonpublic.models import Orphan
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
@@ -12,9 +12,10 @@ class EditButtonColumn(tables.Column):
 
 
 class OrphanTable(tables.Table):
+    play = tables.LinkColumn('play_file', text='View File', args=[A('pk')], attrs={ 'target': '_blank' }, empty_values=() )
 #     selection = tables.CheckBoxColumn(accessor="pk", orderable=False)
 #     edit = EditButtonColumn()
-    play = tables.LinkColumn('play_file', text='View File', args=[A('pk')], attrs={ 'target': '_blank' })
+#     play = tables.LinkColumn('play_file', text='View File', kwargs={ 'pk': Accessor('intid')}, attrs={ 'target': '_blank' }, empty_values=() )
     class Meta:
         model = Orphan
         # add class="paleblue" to <table> tag...
