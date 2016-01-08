@@ -1,5 +1,6 @@
 import datetime
 import os
+import os.path
 
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
@@ -7,7 +8,6 @@ from django.template import RequestContext, loader
 
 from django_tables2 import RequestConfig
 
-from settings import BASE_DIR
 from mythcontent.settings import DATE_DISPLAY_FORMAT, TIME_DISPLAY_FORMAT
 from mythcontent.service import OrphanService, TvRecordingService, VideoService
 from nonpublic.models import Orphan
@@ -79,9 +79,9 @@ def edit_orphan(request, pk):
 """
 Serve video file
 """
-def feed_video(request, video_name):
-    RECORDINGS_ROOT=
-    pass
+# def feed_video(request, video_name):
+#     RECORDINGS_ROOT=
+#     pass
 
 def videos(request):
     pass

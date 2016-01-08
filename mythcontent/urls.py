@@ -7,7 +7,6 @@ urlpatterns = [
     url(r'^process_moves', views.process_moves, name='mythcontent-process-moves',),
     url(r'^orphans/{0,1}$', views.orphans, name='mythcontent-orphans'),
     url(r'^orphan/edit/(\d+)', views.edit_orphan, name='mythcontent-edit-orphan',),
-    url(r'^orphan/feed_video/(\w+)', views.feed_video, name='mythcontent-feed-video',),
                
                
 ]

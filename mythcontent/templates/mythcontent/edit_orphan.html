@@ -7,11 +7,19 @@
     <body>
     	<H1>Playing Orphan File</H1>
     	<hr/>
-    	<h2>File recorded {{ orphan.start_date }} at {{ orphan.start_time }}</h2>
-    	<h2>Duration: {{ orphan.duration }} minutes</h2>
+    	<h2>Recording started {{ orphan.start_date }} at {{ orphan.start_time }} and lasted {{ orphan.duration }} minutes.</h2>
     	<h2>Recorded on channel {{ orphan.channel_number }} ({{orphan.channel_name}})</h2>
     	<hr/>
-    	<a href="{% static 'mythcontent/recordings/'%}{{orphan.filename}}">Click here to play the file</a>
+    	<h2>Title: {{ orphan.title }}</h2>
+    	<h2>Subtitle: {{ orphan.subtitle }}</h2>
+    	<hr/>
+    	<a href="{% static 'mythcontent/vidsamples/'%}{{orphan.samplename}}">Click here to play the file</a>
+    	<hr/>
+    	<video
+    	 src="{% static 'mythcontent/vidsamples/'%}{{orphan.samplename}}" controls >
+    	 Could not embed this video. Use this link instead:<br/>
+    	 <a href="{% static 'mythcontent/vidsamples/'%}{{orphan.samplename}}">Click here to play the file</a>
+    	 </video> 
     	
     	
     	</video>
