@@ -1,5 +1,5 @@
 {% if request.session.tv_program_list %}
-	<form action="{% url 'mythcontent:process_moves' %}" method="post">
+	<form action="{% url 'mythcontent:mythcontent-process-moves' %}" method="post">
 	 {% csrf_token %}
 	<ul>
 	{% for prog in request.session.tv_program_list|dictsort:"title" %}

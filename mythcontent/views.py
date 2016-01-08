@@ -7,6 +7,7 @@ from django.template import RequestContext, loader
 
 from django_tables2 import RequestConfig
 
+from settings import BASE_DIR
 from mythcontent.settings import DATE_DISPLAY_FORMAT, TIME_DISPLAY_FORMAT
 from mythcontent.service import OrphanService, TvRecordingService, VideoService
 from nonpublic.models import Orphan
@@ -30,6 +31,7 @@ Display a list of recorded TV programs
 
 
 def index(request):
+#     return HttpResponse('reached mythcontent-index')
     ts = TvRecordingService()
     tv_program_list = ts.recordings
     # save list in session:
@@ -64,13 +66,22 @@ def orphans(request):
     RequestConfig(request).configure(table)
     return render(request,'mythcontent/orphans.html', { 'orphan_list': table })
 
-
-def play_file(request, pk):
+# def edit_orphan(request):
+#     return HttpResponse('reached edit_orphan')
+# 
+def edit_orphan(request, pk):
     orphan = get_object_or_404(Orphan, intid=pk)
     orphan.fullspec = orphan.directory + os.sep + orphan.filename
-    template = loader.get_template('mythcontent/play_file.html')
+    template = loader.get_template('mythcontent/edit_orphan.html')
     context = RequestContext(request, { 'orphan': orphan })
     return HttpResponse(template.render(context))
+
+"""
+Serve video file
+"""
+def feed_video(request, video_name):
+    RECORDINGS_ROOT=
+    pass
 
 def videos(request):
     pass
@@ -81,9 +92,11 @@ def videos(request):
 #     return HttpResponse(template.render(context))
 # #     return render(request, 'mythcontent/videos.html', context)
 # 
-# def process_moves(request):
-#     if request.method != 'POST':
-#         raise Exception("Must use Post with this view")
+
+def process_moves(request):
+    if request.method != 'POST':
+        raise Exception("Must use Post with this view")
+    return HttpResponse('Reached process_moves')
 #     checkboxlist = request.POST.getlist('selected_programs')
 #     # Each element in the list is channel_id....start_ts
 #     selected_programs = []

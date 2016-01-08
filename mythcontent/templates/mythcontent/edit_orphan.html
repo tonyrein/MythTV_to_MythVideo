@@ -11,8 +11,7 @@
     	<h2>Duration: {{ orphan.duration }} minutes</h2>
     	<h2>Recorded on channel {{ orphan.channel_number }} ({{orphan.channel_name}})</h2>
     	<hr/>
-    	<video name='view' controls autoplay width='50%' height='40%'>
-    		<source src={% static 'recordings' %}/{{orphan.filename}} type='video/mp4' ></source>
+    	<a href="{% static 'mythcontent/recordings/'%}{{orphan.filename}}">Click here to play the file</a>
     	
     	
     	</video>
