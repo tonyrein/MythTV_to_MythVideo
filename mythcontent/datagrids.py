@@ -3,6 +3,7 @@ import os.path
 import django_tables2 as tables
 from django_tables2.utils import Accessor, A  # alias for Accessor
 from nonpublic.models import Orphan
+from django.template import defaultfilters
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 
@@ -19,6 +20,11 @@ class OrphanTable(tables.Table):
 #     edit = EditButtonColumn()
     play = tables.LinkColumn('mythcontent:mythcontent-edit-orphan', text='Edit Entry', args=[ A('intid')], attrs={ 'target': '_blank' }, empty_values=(), orderable=False )
     samplename = tables.Column()
+    # Format filesize as a human-readable number
+    def render_filesize(self,value):
+        return defaultfilters.filesizeformat(value)
+    def render_start_time(self,value):
+        return defaultfilters.time(value, 'h:i A')
 
     class Meta:
         model = Orphan
@@ -27,3 +33,4 @@ class OrphanTable(tables.Table):
 #         sequence = ('play','channel_number', 'channel_name', 'start_date', 'start_time','filesize','duration','title','subtitle')
         exclude = ('samplename','intid', 'channel_id','filename','hostname','directory')
         sequence = ('play','channel_number', 'channel_name', 'start_date', 'start_time','filesize','duration','title','subtitle')
+        localize = ('filesize',)
