@@ -4,7 +4,7 @@ from nonpublic.settings import ORPHANS
 from mythcontent.dto import OrphanDto, ProgInfo, TvRecordingDto
 from mythcontent.utils import stat_remote_host
 from mythcontent.dao import MythApi, TvRecordingApi
-from nonpublic.models import Orphan
+from mythcontent.models import Orphan
 
 class OrphanService(object):
     __instance = None
@@ -44,7 +44,7 @@ class OrphanService(object):
             dirlist = [ {'name': f['name'], 'size': f['size'] } for f in dirlist if f['type'] == 'regular file']
             for f in dirlist:
                 directory,filename = os.path.split(f['name'])
-                if filename not in ts:
+                if filename not in ts and int(f['size']) > 0:
                     ret_list.append(OrphanDto(hostname, f['name'],f['size']))
         return ret_list
     

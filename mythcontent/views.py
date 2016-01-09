@@ -22,20 +22,21 @@ from django.core.urlresolvers import reverse_lazy
 
 
 
-from nonpublic.models import Orphan
-# Create your views here.
+from mythcontent.models import Orphan
 
+# Create your views here.
+# 
 class OrphanList(ListView):
     model = Orphan
-    
+#     
 class OrphanDetail(DetailView):
     model = Orphan
-    
+#     
 class OrphanUpdate(UpdateView):
     model = Orphan
     fields = [ 'title','subtitle' ]
-
-
+# 
+# 
 class OrphanDelete(DeleteView):
     model = Orphan
     success_url = reverse_lazy('orphan_list')

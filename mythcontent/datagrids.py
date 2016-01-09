@@ -20,7 +20,7 @@ class OrphanTable(tables.Table):
 #     edit = EditButtonColumn()
     play = tables.LinkColumn('mythcontent:mythcontent-edit-orphan', text='Edit Entry', args=[ A('intid')], attrs={ 'target': '_blank' }, empty_values=(), orderable=False )
     samplename = tables.Column()
-    # Format filesize as a human-readable number
+    # Format filesize and time columns
     def render_filesize(self,value):
         return defaultfilters.filesizeformat(value)
     def render_start_time(self,value):
@@ -30,7 +30,5 @@ class OrphanTable(tables.Table):
         model = Orphan
         # add class="paleblue" to <table> tag...
         attrs = { 'class': 'paleblue' }
-#         sequence = ('play','channel_number', 'channel_name', 'start_date', 'start_time','filesize','duration','title','subtitle')
         exclude = ('samplename','intid', 'channel_id','filename','hostname','directory')
         sequence = ('play','channel_number', 'channel_name', 'start_date', 'start_time','filesize','duration','title','subtitle')
-        localize = ('filesize',)
