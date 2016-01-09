@@ -1,5 +1,6 @@
 import os.path
 
+from django.core.urlresolvers import reverse
 from django.db import models
 
 # Create your models here.
@@ -21,6 +22,10 @@ class Orphan(models.Model):
     @property
     def samplename(self): #"Calculated" field -- name of sample file
         return os.path.splitext(self.filename)[0] + '.ogv'
+    
+    def get_absolute_url(self):
+        return reverse('orphan_detail', args=[str(self.intid)])
+    
     class Meta:
         managed = True
         db_table = 'orphans'
