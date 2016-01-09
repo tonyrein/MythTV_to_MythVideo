@@ -42,6 +42,10 @@ The normal flow would be:
    v.insertdate = d
 """
 class VideoDaoOrig(models.Model):
+    @classmethod
+    def db_name(cls):
+        return 'mythcopy'
+    
     intid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128)
     subtitle = models.TextField()
@@ -77,7 +81,7 @@ class VideoDaoOrig(models.Model):
     fanart = models.TextField(blank=True, null=True)
     insertdate = models.DateTimeField(blank=True, null=True)
     contenttype = models.CharField(max_length=43)
-
+    
     class Meta:
         managed = False
         db_table = 'videometadata'
