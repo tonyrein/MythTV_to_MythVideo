@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% for orphan in object_list %}
+	<p>
+	<a href="{% url 'orphan_edit' orphan.pk %}">Edit</a>
+	{{orphan.start_date}}{{orphan.start_time}}
+	{{orphan.channel_number}}{{orphan.channel_name}}
+	{{orphan.duration}}
+	{{orphan.title}}{{orphan.subtitle}}
+	</p>
+	{% endfor %}
+
+{% endblock %}

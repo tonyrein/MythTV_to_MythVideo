@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    <p>You have requested deletion of the orphan recorded</p>
+    <p>{{orphan.date}} at {{orphan.time}} on channel {{orphan.channel_number}}</p>
+    <p>Are you sure you want to delete it?</p>
+    <input type="submit" value="yes" />
+    <a href="{% url 'orphan_list' %}">no</a>
+</form>
