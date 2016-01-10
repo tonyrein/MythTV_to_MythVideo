@@ -1,7 +1,6 @@
-import os.path
 
 import django_tables2 as tables
-from django_tables2.utils import Accessor, A  # alias for Accessor
+from django_tables2.utils import A  # alias for Accessor
 from django.template import defaultfilters
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
