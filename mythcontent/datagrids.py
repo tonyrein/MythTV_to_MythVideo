@@ -2,10 +2,11 @@ import os.path
 
 import django_tables2 as tables
 from django_tables2.utils import Accessor, A  # alias for Accessor
-from nonpublic.models import Orphan
 from django.template import defaultfilters
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
+
+from mythcontent.models import Orphan
 
 class EditButtonColumn(tables.Column): 
     empty_values = list() 

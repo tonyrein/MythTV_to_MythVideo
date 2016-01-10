@@ -15,19 +15,21 @@
 # from mythcontent.datagrids import OrphanTable
 
 
-
+from django_tables2 import SingleTableView
 from django.views.generic import ListView, DetailView
 from django.views.generic import UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 
 
-
+from mythcontent.datagrids import OrphanTable
 from mythcontent.models import Orphan
 
 # Create your views here.
 # 
-class OrphanList(ListView):
+class OrphanList(SingleTableView):
     model = Orphan
+    table_class = OrphanTable
+    template_name = 'mythcontent/orphans.html'
 #     
 class OrphanDetail(DetailView):
     model = Orphan
